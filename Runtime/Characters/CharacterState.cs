@@ -14,19 +14,17 @@ namespace SF.Character.Core
 		Jumping,
 		Falling
 	}
-	public enum StatusState
+	public enum CharacterStatus
 	{
 		Alive,
-		Dead,
+		Dead
 	}
 
 	[System.Serializable]
-	public struct CharacterState
+	public class CharacterState
 	{
-		
-
-		public CharacterType CharacterType;
+		public CharacterType CharacterType = CharacterType.Enemy;
 		public MovementState MovementState;
-		public StatusState Status;
+		public CharacterStatus CharacterStatus;
 	}
 }

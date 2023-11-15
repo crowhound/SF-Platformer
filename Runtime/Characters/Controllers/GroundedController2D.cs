@@ -5,38 +5,53 @@ using SF.Character.Core;
 
 namespace SF.Characters.Controllers
 {
-    public class GroundedController2D : Controller2D
+	[System.Serializable]
+	public struct CollisionInfo
+	{
+		public RaycastHit2D GroundedHit;
+		public RaycastHit2D CeilingHit;
+		public RaycastHit2D RightHit;
+		public RaycastHit2D LeftHit;
+
+		public bool IsCollidingRight;
+		public bool IsCollidingLeft;
+		public bool IsCollidingAbove;
+		public bool IsCollidingBelow;
+	}
+
+	public class GroundedController2D : Controller2D
     {
 		[Header("States")]
 		public CharacterState CharacterState;
 
 		[Header("Physics Properties")]
 		public MovementProperties DefaultPhysics = new(5);
-		public MovementProperties CurrentPhysics;
+		public MovementProperties CurrentPhysics = new(0);
 
 		[Header("Collision Settings")]
 		public ContactFilter2D PlatformFilter;
 		public GameObject StandingOnObject;
-		public CollisionController CollisionController = new(0.01f);
-		protected RaycastHit2D GroundedHit;
-		protected RaycastHit2D CeilingHit;
-		protected RaycastHit2D RightHit;
-		protected RaycastHit2D LeftHit;
-		public bool IsCollidingRight = false;
-		public bool IsCollidingLeft = false;
-		public bool IsCollidingAbove = false;
+
+		protected CollisionInfo CollisionInfo;
+		public CollisionController CollisionController = new(0.05f,0.02f,3,4);
+		
+
 		[Header("Booleans")]
 		public bool IsGrounded = false;
 		public bool IsSwimming = false;
 		public bool IsJumping = false;
-		#region Components
+		#region Components 
 		protected BoxCollider2D _boxCollider;
 		#endregion
+		protected override void OnAwake()
+		{
+			_boxCollider = GetComponent<BoxCollider2D>();
+			_boundsData.Bounds = _boxCollider.bounds;
+		}
 		protected override void OnStart()
 		{
-			if(DefaultPhysics.GroundMaxSpeed < DefaultPhysics.GroundSpeed)
-				DefaultPhysics.GroundMaxSpeed = DefaultPhysics.GroundSpeed;
-
+			if(DefaultPhysics.GroundSpeed > DefaultPhysics.GroundMaxSpeed)
+				DefaultPhysics.GroundSpeed = DefaultPhysics.GroundMaxSpeed;
 			CurrentPhysics = DefaultPhysics;
 		}
 		#region Collision Calculations
@@ -95,21 +110,25 @@ namespace SF.Characters.Controllers
 		protected virtual void SideCollisionChecks()
 		{
 			//Right Side
-			RightHit = Physics2D.Raycast(_boundsData.MiddleRight,
+			CollisionInfo.RightHit = Physics2D.Raycast(_boundsData.MiddleRight,
 				Vector2.right, 
 				CollisionController.HoriztonalRayDistance,
 				PlatformFilter.layerMask);
 
-			IsCollidingRight = RightHit.collider != null;
+			CollisionInfo.IsCollidingRight = CollisionInfo.RightHit.collider != null;
 
-			LeftHit = Physics2D.Raycast(_boundsData.MiddleLeft,
+			CollisionInfo.LeftHit = Physics2D.Raycast(_boundsData.MiddleLeft,
 				Vector2.left,
 				CollisionController.HoriztonalRayDistance,
 				PlatformFilter.layerMask);
 
-			IsCollidingLeft = LeftHit.collider != null;
+			CollisionInfo.IsCollidingLeft = CollisionInfo.LeftHit.collider != null;
 		}
 		#endregion
+		protected override void OnPreFixedUpdate()
+		{
+			_boundsData.Bounds = _boxCollider.bounds;
+		}
 		protected override void CalculateHorizontal()
 		{
 
@@ -126,14 +145,14 @@ namespace SF.Characters.Controllers
 						: _calculatedVelocity.x;
 
 				_calculatedVelocity.x = Direction.x > 0
-					? IsCollidingRight // Moving Right
+					? CollisionInfo.IsCollidingRight // Moving Right
 						? 0
 						: _calculatedVelocity.x
-					: IsCollidingLeft // Moving Left
+					: CollisionInfo.IsCollidingLeft // Moving Left
 						? 0
 						: _calculatedVelocity.x;
 			}
-			else
+			else if(_controllerVelocity.x == 0)
 			{
 				_calculatedVelocity.x = 0;
 				_rigidbody2D.velocityX = 0;
@@ -160,13 +179,23 @@ namespace SF.Characters.Controllers
 			}
 			else // IsGrounded
 			{
-				_calculatedVelocity.y = (IsJumping) ? _calculatedVelocity.y : 0;
-				_rigidbody2D.velocityY = (IsJumping) ? _rigidbody2D.velocityY : 0;
+				_calculatedVelocity.y = IsJumping ? _calculatedVelocity.y : 0;
+				_rigidbody2D.velocityY = IsJumping ? _rigidbody2D.velocityY : 0;
 			}
 		}
 		public virtual void UpdatePhysics(MovementProperties movementProperties)
 		{
-			CurrentPhysics = movementProperties;
+			CurrentPhysics.GroundSpeed = movementProperties.GroundSpeed;
+			CurrentPhysics.GroundAcceleration = movementProperties.GroundAcceleration;
+			CurrentPhysics.GroundMaxSpeed = movementProperties.GroundMaxSpeed;
+			
+			CurrentPhysics.GravityScale = movementProperties.GravityScale;
+			CurrentPhysics.GravityAcceleration = movementProperties.GravityAcceleration;
+			CurrentPhysics.TerminalVelocity = movementProperties.TerminalVelocity;
+			CurrentPhysics.MaxUpForce = movementProperties.MaxUpForce;
+			
+			CurrentPhysics.JumpHeight = movementProperties.JumpHeight;
+
 		}
 		protected override void CalculateMovementState()
 		{

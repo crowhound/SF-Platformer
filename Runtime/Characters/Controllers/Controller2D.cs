@@ -83,23 +83,23 @@ namespace SF.Characters.Controllers
 		protected virtual void CalculateVertical()
 		{
 		}
-		protected virtual void AddForce(Vector2 force)
+		public virtual void AddForce(Vector2 force)
 		{
-			_calculatedVelocity += force;
+			_controllerVelocity += force;
 		}
-		protected virtual void AddHorizontalForce(float horizontalForce)
+		public virtual void AddHorizontalForce(float horizontalForce)
 		{
-			_calculatedVelocity.x += horizontalForce;
+			_controllerVelocity.x += horizontalForce;
 		}
-		protected virtual void AddVerticalForce(float verticalForce)
+		public virtual void AddVerticalForce(float verticalForce)
 		{
 			_controllerVelocity.y += verticalForce;
 		}
-		protected virtual void SetHorizontalVelocity(float horizontalForce)
+		public virtual void SetHorizontalVelocity(float horizontalForce)
 		{
 			_rigidbody2D.velocityX = horizontalForce;
 		}
-		protected virtual void SetVerticalVelocity(float verticalForce)
+		public virtual void SetVerticalVelocity(float verticalForce)
 		{
 			_calculatedVelocity.y = verticalForce;
 		}

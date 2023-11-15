@@ -7,6 +7,7 @@ using UnityEngine.InputSystem;
 
 using SF.InputSystem;
 
+
 namespace SF.Characters.Controllers
 {
 	[RequireComponent(typeof(BoxCollider2D))]
@@ -15,10 +16,7 @@ namespace SF.Characters.Controllers
 		public float JumpInput;
 
 		#region Life cycles
-		protected override void OnAwake()
-		{
-			_boxCollider = GetComponent<BoxCollider2D>();
-		}
+
 		protected override void OnPreFixedUpdate()
 		{
 			_boundsData.Bounds = _boxCollider.bounds;

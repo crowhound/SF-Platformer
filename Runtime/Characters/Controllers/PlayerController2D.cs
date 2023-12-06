@@ -5,23 +5,14 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-using SF.InputSystem;
+using SF.InputModule;
 
 
 namespace SF.Characters.Controllers
 {
-	[RequireComponent(typeof(BoxCollider2D))]
     public class PlayerController : GroundedController2D
     {
-		public float JumpInput;
-
 		#region Life cycles
-
-		protected override void OnPreFixedUpdate()
-		{
-			_boundsData.Bounds = _boxCollider.bounds;
-			JumpInput = InputManager.Controls.Player.Jump.ReadValue<float>();
-		}
 
 		private void OnEnable()
 		{

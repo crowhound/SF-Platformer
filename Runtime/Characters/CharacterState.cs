@@ -23,7 +23,6 @@ namespace SF.Character.Core
 	[System.Serializable]
 	public class CharacterState
 	{
-		public CharacterType CharacterType = CharacterType.Enemy;
 		public MovementState MovementState;
 		public CharacterStatus CharacterStatus;
 	}

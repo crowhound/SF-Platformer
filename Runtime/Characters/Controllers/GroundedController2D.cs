@@ -19,6 +19,7 @@ namespace SF.Characters.Controllers
 		public bool IsCollidingBelow;
 	}
 
+	[RequireComponent(typeof(BoxCollider2D))]
 	public class GroundedController2D : Controller2D
     {
 		[Header("States")]

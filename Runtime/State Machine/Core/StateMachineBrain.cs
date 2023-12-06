@@ -18,7 +18,7 @@ namespace SF.StateMachine.Core
 		[Tooltip("This is the gameobject that the newState machine brain is controlling.")]
 		
         public GameObject ControlledGameObject;
-        protected List<StateCore> _states = new();
+        [SerializeField]protected List<StateCore> _states = new();
 
 		private void Awake()
 		{

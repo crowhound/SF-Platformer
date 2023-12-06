@@ -8,15 +8,25 @@ namespace SF.StateMachine.AI
     public class AIBrain : MonoBehaviour
     {
         public List<AIState> States = new();
-		private List<AIState> AIStates = new();
+
 		public void Awake()
 		{
-			
+			Init();
 		}
 
-		public void Start()
+		protected void Start()
 		{
 
+		}
+
+		private void Init()
+		{
+			Debug.Log(States.Count);
+			for(int x = 0; x < States.Count; x++)
+			{
+				Debug.Log(States[x]);
+				States[x].Init(this);
+			}
 		}
 	}
 }

@@ -1,7 +1,7 @@
 using SF.Abilities.Characters;
 using SF.Character.Core;
 using SF.Characters.Controllers;
-using SF.InputSystem;
+using SF.InputModule;
 
 using UnityEngine;
 using UnityEngine.InputSystem;

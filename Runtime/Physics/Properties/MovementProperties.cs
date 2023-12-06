@@ -3,18 +3,15 @@ namespace SF.Physics
     [System.Serializable]
     public struct MovementProperties
     {
-        [UnityEngine.Header("Gound Physics")]
         public float GroundSpeed;
         public float GroundAcceleration;
         public float GroundMaxSpeed;
 
-        [UnityEngine.Header("Air Physics")]
         public float GravityScale;
         public float GravityAcceleration;
         public float TerminalVelocity;
         public float MaxUpForce;
 
-        [UnityEngine.Header("Jump Physics")]
         public float JumpHeight;
 
         public MovementProperties(
@@ -22,10 +19,10 @@ namespace SF.Physics
             float _groundAcceleration = 1f,
             float _groundMaxSpeed = 10f,
             float _gravityScale = 1,
-            float _gravityAcceleration = 1f,
+            float _gravityAcceleration = 9.8f,
             float _terminalVelocity = 20f,
-            float _maxUpForce = 20f,
-            float _jumpheight = 8f)
+            float _maxUpForce = 15f,
+            float _jumpheight = 7f)
         {
             GroundSpeed = _groundSpeed;
             GroundAcceleration = _groundAcceleration;

@@ -70,7 +70,14 @@ namespace SF.Characters.Controllers
 		#region Movement Calculations
 		protected virtual void Move()
 		{
+			_rigidbody2D.velocity = _calculatedVelocity;
+			/*
+			  The old way of doing it. Converted over to use per velocity to match the standard of non kinematic rigidbodies being moved with velocity. 
+
+			 Will need to keep an eye on things that change the vertical velocity through code and not through Unity's Gravity physic step. 
+			 
 			_rigidbody2D.MovePosition( (Vector2)transform.position + _calculatedVelocity * Time.fixedDeltaTime);
+			*/
 			Velocity = _calculatedVelocity;
 		}
 		protected virtual void ColisionChecks()
@@ -83,25 +90,26 @@ namespace SF.Characters.Controllers
 		protected virtual void CalculateVertical()
 		{
 		}
-		public virtual void AddForce(Vector2 force)
+		public virtual void AddVelocity(Vector2 velocity)
 		{
-			_controllerVelocity += force;
+			_controllerVelocity += velocity;
 		}
-		public virtual void AddHorizontalForce(float horizontalForce)
+		public virtual void AddHorizontalVelocity(float horizontalVelocity)
 		{
-			_controllerVelocity.x += horizontalForce;
+			_controllerVelocity.x += horizontalVelocity;
 		}
-		public virtual void AddVerticalForce(float verticalForce)
+		public virtual void AddVerticalVelocity(float verticalVelocity)
 		{
-			_controllerVelocity.y += verticalForce;
+			_controllerVelocity.y += verticalVelocity;
 		}
-		public virtual void SetHorizontalVelocity(float horizontalForce)
+		public virtual void SetHorizontalVelocity(float horizontalVelocity)
 		{
-			_rigidbody2D.velocityX = horizontalForce;
+			_rigidbody2D.velocityX = horizontalVelocity;
 		}
-		public virtual void SetVerticalVelocity(float verticalForce)
+		public virtual void SetVerticalVelocity(float verticalVelocity)
 		{
-			_calculatedVelocity.y = verticalForce;
+			// Need to compare this to _rigidbody2D.velocityY to see which one feels better. 
+			_calculatedVelocity.y = verticalVelocity;
 		}
 		protected virtual void CalculateMovementState()
 		{

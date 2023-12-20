@@ -10,8 +10,8 @@ namespace SF.Physics.Collision
 		public float VerticalRayDistance;
 
 		[Header("Ray Amount")]
-		public short HoriztonalRayAmount;
-		public short VerticalRayAmount;
+		public int HoriztonalRayAmount;
+		public int VerticalRayAmount;
 
 		[HideInInspector] public RaycastHit2D[] RaycastHit2Ds;
 		public CollisionController(float horiztonalRayDistance = 0.01f,

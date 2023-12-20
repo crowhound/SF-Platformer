@@ -33,7 +33,7 @@ namespace SF.Characters.Controllers
 		public ContactFilter2D PlatformFilter;
 		public GameObject StandingOnObject;
 
-		protected CollisionInfo CollisionInfo;
+		public CollisionInfo CollisionInfo;
 		public CollisionController CollisionController = new(0.05f,0.02f,3,4);
 		
 
@@ -68,10 +68,11 @@ namespace SF.Characters.Controllers
 				IsGrounded = false;
 				return;
 			}
-			//GroundedHit = Physics2D.Raycast(_boundsData.BottomCenter, Vector2.down, CollisionController.VerticalRayDistance, PlatformFilter.layerMask);
 			IsGrounded = RaycastMultiple(_boundsData.BottomLeft, _boundsData.BottomRight ,Vector2.down, CollisionController.VerticalRayDistance, PlatformFilter, CollisionController.VerticalRayAmount);
 
-			//IsGrounded = (GroundedHit) ? true: false;
+			// This will eventually also show colliding with other things than platforms.
+			CollisionInfo.IsCollidingBelow = RaycastMultiple(_boundsData.BottomLeft, _boundsData.BottomRight ,Vector2.down, CollisionController.VerticalRayDistance, PlatformFilter, CollisionController.VerticalRayAmount);
+
 			//StandingOnObject = (GroundedHit) ? GroundedHit.collider.gameObject : null;
 		}
 
@@ -98,32 +99,13 @@ namespace SF.Characters.Controllers
 			return RaycastMultiple(origin, end, direction, distance, contactFilter2D.layerMask, numberOfRays);
 		}
 
-		/* Custom Raycast hit data I will create for 2D Raycasting.
-		public HitData2D RaycastMultiple(Vector2 origin, Vector2 end, float distance, ContactFilter2D contactFilter2D)
-		{
-			return RaycastMultiple(origin, end, distance, contactFilter2D.layerMask);
-		}*/
-
-		protected virtual void RightCollisionChecks()
-		{
-
-		}
 		protected virtual void SideCollisionChecks()
 		{
-			//Right Side
-			CollisionInfo.RightHit = Physics2D.Raycast(_boundsData.MiddleRight,
-				Vector2.right, 
-				CollisionController.HoriztonalRayDistance,
-				PlatformFilter.layerMask);
+			// Right Side
+			CollisionInfo.IsCollidingRight = RaycastMultiple(_boundsData.TopRight, _boundsData.BottomRight ,Vector2.right, CollisionController.HoriztonalRayDistance, PlatformFilter, CollisionController.HoriztonalRayAmount);
 
-			CollisionInfo.IsCollidingRight = CollisionInfo.RightHit.collider != null;
-
-			CollisionInfo.LeftHit = Physics2D.Raycast(_boundsData.MiddleLeft,
-				Vector2.left,
-				CollisionController.HoriztonalRayDistance,
-				PlatformFilter.layerMask);
-
-			CollisionInfo.IsCollidingLeft = CollisionInfo.LeftHit.collider != null;
+			// Left Side
+			CollisionInfo.IsCollidingLeft = RaycastMultiple(_boundsData.TopLeft, _boundsData.BottomLeft ,Vector2.left, CollisionController.HoriztonalRayDistance, PlatformFilter, CollisionController.HoriztonalRayAmount);
 		}
 		#endregion
 		protected override void OnPreFixedUpdate()

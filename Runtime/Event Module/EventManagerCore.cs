@@ -4,14 +4,27 @@ using UnityEngine;
 
 namespace SF.Events
 {
+    /// <summary>
+    /// The categories of events in the project.
+    /// </summary>
     public enum GameEventTypes
     {
-        Score
+        Score,
+        Audio,
     }
+
+    /// <summary>
+    /// A utility class that helps classes to start listening and stop listening to events using simple function calls. 
+    /// </summary>
     public static class EventRegister
     {
         public delegate void Delegate<T>(T eventType);
 
+        /// <summary>
+        /// Registers a class instance to listen for any type of event that is passed in. EventType is a generic variable type that accepts any struct.
+        /// </summary>
+        /// <typeparam name="EventType"></typeparam>
+        /// <param name="caller"></param>
         public static void EventStartListening<EventType> (this EventListener<EventType> caller) where EventType : struct
         {
             EventManager.AddListener<EventType>(caller);

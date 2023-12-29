@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace SF.InputSystem
+namespace SF.InputModule
 {
     public class InputManager : MonoBehaviour
     {

@@ -1,10 +1,15 @@
-using UnityEngine;
-
-namespace SF.Abilities.Characters
+namespace SF.AbilityModule
 {
-    public class AbilityCore : MonoBehaviour
+	/// <summary>
+	/// Abilities contain the data for what actions can do and how they do them.
+	/// </summary>
+	[System.Serializable]
+    public class AbilityCore : IAbility
     {
-		public GameObject User;
+		public AbilityCore()
+		{
+			
+		}
 		public virtual void Initialize()
 		{
 			OnInitialize();

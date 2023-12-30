@@ -6,16 +6,19 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 using SF.InputModule;
+using SF.Abilities.CharacterModule;
 
 
 namespace SF.Characters.Controllers
 {
     public class PlayerController : GroundedController2D
     {
-		#region Life cycles
 
+		public JumpAbility JumpAbility;
+		#region Life cycles
 		private void OnEnable()
 		{
+			JumpAbility = new JumpAbility(gameObject, this);
 			InputManager.Controls.Player.Enable();
 			InputManager.Controls.Player.Move.performed += OnInputMove;
 			InputManager.Controls.Player.Move.canceled += OnInputMove;
@@ -44,10 +47,7 @@ namespace SF.Characters.Controllers
 		}
 		private void OnInputJump(InputAction.CallbackContext context)
 		{
-			if(!IsGrounded) return;
-
-			IsJumping = true;
-			SetVerticalVelocity(CurrentPhysics.JumpHeight);
+			JumpAbility.Use();
 		}
 		#endregion
 		

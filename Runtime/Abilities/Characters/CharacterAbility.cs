@@ -2,7 +2,7 @@ using SF.AbilityModule;
 using UnityEngine;
 namespace SF.Abilities.Characters
 {
-    public class CharacterAbility : ICharacterAbility
+    public abstract class CharacterAbility : ICharacterAbility
     {
 		public bool IsEnabled = true;
 

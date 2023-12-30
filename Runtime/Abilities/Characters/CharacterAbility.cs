@@ -1,10 +1,11 @@
+using SF.AbilityModule;
+using UnityEngine;
 namespace SF.Abilities.Characters
 {
-    public class CharacterAbility : AbilityCore
+    public class CharacterAbility : ICharacterAbility
     {
-		public override void Initialize()
-		{
+		public bool IsEnabled = true;
 
-		}
+		[System.NonSerialized] protected GameObject _owner;
 	}
 }

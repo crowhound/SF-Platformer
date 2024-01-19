@@ -104,7 +104,7 @@ namespace SF.Characters.Controllers
 		}
 		public virtual void SetHorizontalVelocity(float horizontalVelocity)
 		{
-			_rigidbody2D.velocityX = horizontalVelocity;
+			_calculatedVelocity.x = horizontalVelocity;
 		}
 		public virtual void SetVerticalVelocity(float verticalVelocity)
 		{

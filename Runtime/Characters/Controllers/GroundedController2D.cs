@@ -2,6 +2,7 @@ using UnityEngine;
 using SF.Physics;
 using SF.Physics.Collision;
 using SF.Character.Core;
+using System;
 
 namespace SF.Characters.Controllers
 {
@@ -28,6 +29,10 @@ namespace SF.Characters.Controllers
 		[Header("Physics Properties")]
 		public MovementProperties DefaultPhysics = new(5);
 		public MovementProperties CurrentPhysics = new(0);
+		/// <summary>
+		/// Reference speed if used for passing in a value in horizontal calculatin based on running or not.
+		/// </summary>
+		protected float _referenceSpeed;
 
 		[Header("Collision Settings")]
 		public ContactFilter2D PlatformFilter;
@@ -39,25 +44,33 @@ namespace SF.Characters.Controllers
 
 		[Header("Booleans")]
 		public bool IsGrounded = false;
+		protected bool _wasGroundedLastFrame = false;
+		public bool IsRunning = false;
 		public bool IsSwimming = false;
 		public bool IsJumping = false;
+		public bool IsFalling = false;
 		#region Components 
 		protected BoxCollider2D _boxCollider;
+
+		public Action OnGrounded;
 		#endregion
 		protected override void OnAwake()
 		{
 			_boxCollider = GetComponent<BoxCollider2D>();
 			_boundsData.Bounds = _boxCollider.bounds;
+			
 		}
 		protected override void OnStart()
 		{
 			if(DefaultPhysics.GroundSpeed > DefaultPhysics.GroundMaxSpeed)
 				DefaultPhysics.GroundSpeed = DefaultPhysics.GroundMaxSpeed;
 			CurrentPhysics = DefaultPhysics;
+			_referenceSpeed = CurrentPhysics.GroundSpeed;
 		}
 		#region Collision Calculations
 		protected override void ColisionChecks()
 		{
+			_wasGroundedLastFrame = IsGrounded;
 			GroundChecks();
 			SideCollisionChecks();
 		}
@@ -74,6 +87,12 @@ namespace SF.Characters.Controllers
 			CollisionInfo.IsCollidingBelow = RaycastMultiple(_boundsData.BottomLeft, _boundsData.BottomRight ,Vector2.down, CollisionController.VerticalRayDistance, PlatformFilter, CollisionController.VerticalRayAmount);
 
 			//StandingOnObject = (GroundedHit) ? GroundedHit.collider.gameObject : null;
+
+			// If grounded last frame, but grounded this frame call OnGrounded
+			if(!_wasGroundedLastFrame && IsGrounded)
+			{
+				OnGrounded?.Invoke();
+			}
 		}
 
 		public bool RaycastMultiple(Vector2 origin, Vector2 end, Vector2 direction, float distance, LayerMask layerMask, int numberOfRays = 4)
@@ -114,10 +133,9 @@ namespace SF.Characters.Controllers
 		}
 		protected override void CalculateHorizontal()
 		{
-
 			if(Direction.x != 0)
 			{
-				_calculatedVelocity.x = CurrentPhysics.GroundSpeed * Direction.x;
+				_calculatedVelocity.x = _referenceSpeed * Direction.x;
 
 				_calculatedVelocity.x = Direction.x > 0
 					? (_calculatedVelocity.x > CurrentPhysics.GroundMaxSpeed) // Moving Right
@@ -184,13 +202,20 @@ namespace SF.Characters.Controllers
 		{
 			if(IsJumping)
 			{
-				CharacterState.MovementState = (_calculatedVelocity.y > 0) ? MovementState.Jumping : MovementState.Falling;
-				if(CharacterState.MovementState == MovementState.Falling)
+				CharacterState.MovementState = (_calculatedVelocity.y > 0) 
+					? MovementState.Jumping 
+					: MovementState.Falling;
+
+				if (CharacterState.MovementState == MovementState.Falling)
+				{
+					IsFalling = true;
 					IsJumping = false;
+				}
 			}
 
 			if(IsGrounded)
 			{
+				IsFalling = false;
 				CharacterState.MovementState = (Direction.x == 0) ? MovementState.Idle : MovementState.Walking;
 			}
 		}

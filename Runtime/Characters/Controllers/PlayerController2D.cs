@@ -22,14 +22,20 @@ namespace SF.Characters.Controllers
 			InputManager.Controls.Player.Enable();
 			InputManager.Controls.Player.Move.performed += OnInputMove;
 			InputManager.Controls.Player.Move.canceled += OnInputMove;
+			InputManager.Controls.Player.Running.performed += OnMoveInputRun;
+			InputManager.Controls.Player.Running.canceled += OnMoveInputRun;
+			
 			InputManager.Controls.Player.Jump.performed += OnInputJump;
 		}
-		private void OnDisable()
+
+        private void OnDisable()
 		{
 			if(InputManager.Instance == null) return;
 
 			InputManager.Controls.Player.Move.performed -= OnInputMove;
 			InputManager.Controls.Player.Move.canceled -= OnInputMove;
+			InputManager.Controls.Player.Running.performed -= OnMoveInputRun;
+			InputManager.Controls.Player.Running.canceled -= OnMoveInputRun;
 			InputManager.Controls.Player.Jump.performed -= OnInputJump;
 		}
 		#endregion
@@ -45,6 +51,13 @@ namespace SF.Characters.Controllers
 
 			Direction.x = input.x != 0 ? input.x : 0;
 		}
+		private void OnMoveInputRun(InputAction.CallbackContext context)
+        {
+			IsRunning = context.ReadValue<float>() > 0;
+			_referenceSpeed = IsRunning
+			? CurrentPhysics.GroundRunningSpeed
+			: CurrentPhysics.GroundSpeed;
+        }
 		private void OnInputJump(InputAction.CallbackContext context)
 		{
 			JumpAbility.Use();

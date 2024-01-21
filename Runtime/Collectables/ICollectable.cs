@@ -1,4 +1,4 @@
-namespace SF.CollectionModule
+namespace SF.CollectableModule
 {
     public interface ICollectable 
     {

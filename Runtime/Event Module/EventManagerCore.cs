@@ -51,7 +51,7 @@ namespace SF.Events
         public static void AddListener<EventType>(EventListener<EventType> listener) where EventType : struct
         {
             Type eventType = typeof(EventType);
-
+            
             if(!_subscribersList.ContainsKey(eventType))
             {
                 _subscribersList[eventType] = new List<EventListenerBase>();
@@ -81,7 +81,16 @@ namespace SF.Events
     
         public static void TriggerEvent<EventType> (EventType newEvent) where EventType : struct
         {
-
+            List<EventListenerBase> eventList;
+            // Tries to find values in the subscribed list of the type event and if not found return.
+            if(!_subscribersList.TryGetValue(typeof(EventType), out eventList))
+            {
+                return;
+            }
+            for (int i = 0; i < eventList.Count; i++)
+            {
+                (eventList[i] as EventListener<EventType>).OnEvent(newEvent);
+            }
         }
     }
 }

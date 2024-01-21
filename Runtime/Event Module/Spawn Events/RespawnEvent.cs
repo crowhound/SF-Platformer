@@ -22,10 +22,16 @@ namespace SF.Events
         }
         static RespawnEvent respawnEvent;
 
-         public static void Trigger(RespawnEventTypes eventType, GameObject respawnGameObject = null)
+         public static void Trigger(RespawnEventTypes eventType)
+         {
+            respawnEvent.EventType = eventType;
+            EventManager.TriggerEvent(respawnEvent);
+         }
+         public static void Trigger(RespawnEventTypes eventType, GameObject respawnGameObject)
          {
             respawnEvent.EventType = eventType;
             respawnEvent.RespawnGameObject = respawnGameObject;
+            EventManager.TriggerEvent(respawnEvent);
          }
     }
 }

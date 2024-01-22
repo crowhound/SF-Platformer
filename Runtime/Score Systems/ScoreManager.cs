@@ -1,15 +1,16 @@
 using UnityEngine;
-
 using SF.Events;
-
+using TMPro;
 namespace SF
 {
-    public class ScoreManager : MonoBehaviour, EventListener<ScoreEvent>
+    public class ScoreManager : MonoBehaviour, EventListener<ScoreEvent>, EventListener<RespawnEvent>
     {
         public float Score;
+        public TMP_Text ScoreText;
         public float LevelHighScore;
         public float ScoreMultiplier = 1;
-        public void OnEvent(ScoreEvent scoreEvent)
+		#region OnEvents
+		public void OnEvent(ScoreEvent scoreEvent)
         {
             switch (scoreEvent.EventType)
             {
@@ -24,21 +25,47 @@ namespace SF
                     break;
             }
         }
-        private void ScoreChange(float scoreChange, bool settingScore = false)
+
+		public void OnEvent(RespawnEvent respawnEvent)
+		{
+			switch(respawnEvent.EventType)
+			{
+				case RespawnEventTypes.PlayerRespawn:
+					ResetScore();
+					break;
+			}
+		}
+		#endregion
+		#region Score Functions
+		private void ResetScore()
+		{
+            Score = 0;
+
+			if(ScoreText != null)
+				ScoreText.text = ($"Score: {Score}");
+		}
+
+		private void ScoreChange(float scoreChange, bool settingScore = false)
         {
             Score = (settingScore)
                 ? scoreChange
                 : Score += scoreChange;
+
+            if(ScoreText != null)
+                ScoreText.text = ($"Score: {Score}");
         }
-        #region Enable/Disable
-        private void OnEnable()
+		#endregion
+		#region Enable/Disable
+		private void OnEnable()
         {
              this.EventStartListening<ScoreEvent>();
+             this.EventStartListening<RespawnEvent>();
         }
         private void OnDisable()
         {
             this.EventStopListening<ScoreEvent>();
+            this.EventStopListening<RespawnEvent>();
         }
-        #endregion
-    }
+		#endregion
+	}
 }

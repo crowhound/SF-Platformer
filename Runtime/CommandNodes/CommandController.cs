@@ -8,22 +8,16 @@ namespace SF.CommandModule
         [SerializeReference]
         public List<CommandNode> Commands = new List<CommandNode>();
 
+        [SerializeField] private bool DoStart = false;
+
         public void Awake()
         {
         }
 
-        public void OnValidate()
-        {
-            if (Commands.Count == 0)
-            {
-                Commands.Add(new TransformCommand(transform));
-                Commands.Add(new SFXCommand());
-                Commands.Add(new TransformCommand(transform));
-            }
-        }
         public void Start()
         {
-            StartCommands();
+            if (DoStart)
+                StartCommands();
         }
 
         public async Awaitable StartCommands()

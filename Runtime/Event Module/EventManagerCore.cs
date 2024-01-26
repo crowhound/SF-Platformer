@@ -57,9 +57,10 @@ namespace SF.Events
                 _subscribersList[eventType] = new List<EventListenerBase>();
             }
 
-            // Add a check to see if the subscriber already exists
-
-            _subscribersList[eventType].Add(listener);
+            if(!DoesListenerExists(eventType, listener))
+            {
+                _subscribersList[eventType].Add(listener);
+            } 
         }
 
         public static void RemoveListener<EventType>(EventListener<EventType> listener) where EventType : struct
@@ -74,11 +75,41 @@ namespace SF.Events
             List<EventListenerBase> subscriberList = _subscribersList[eventType];
             // Add a check to see if the subscriber already exists
 
-            _subscribersList[eventType].Add(listener);
+            for (int i = 0; i < subscriberList.Count; i++)
+            {
+               if(subscriberList[i] == listener)
+               {
+                    subscriberList.Remove(subscriberList[i]);
 
-            // TODO I need to finish the removal of the listener to the event subscriber.
+                    if(subscriberList.Count == 0)
+                    {
+                        _subscribersList.Remove(eventType);
+                    }
+
+                    return;
+               }
+            }
         }
-    
+
+        public static bool DoesListenerExists(Type type, EventListenerBase listener)
+        {
+            List<EventListenerBase> listeners;
+            if (!_subscribersList.TryGetValue(type, out listeners))
+                return false;
+
+            bool exists = false;
+
+            for (int i = 0; i < listeners.Count; i++)
+            {
+                if(listeners[i] == listener)
+                {
+                    exists = true;
+                    break;
+                }
+            }
+
+            return exists;
+        }
         public static void TriggerEvent<EventType> (EventType newEvent) where EventType : struct
         {
             List<EventListenerBase> eventList;

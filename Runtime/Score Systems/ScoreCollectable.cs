@@ -21,7 +21,7 @@ namespace SF.CollectableModule
 		{
 			switch(respawnEvent.EventType)
 			{
-				case RespawnEventTypes.PlayerRespawn:
+				case RespawnEventTypes.GameObjectRespawn:
 					Respawn();
 					break;
 			}
@@ -48,7 +48,7 @@ namespace SF.CollectableModule
 			this.EventStartListening<RespawnEvent>();
 			this.EventStartListening<CheckPointEvent>();
 		}
-		private void OnDisable()
+		private void OnDestroy()
 		{
 			this.EventStopListening<RespawnEvent>();
 			this.EventStopListening<CheckPointEvent>();

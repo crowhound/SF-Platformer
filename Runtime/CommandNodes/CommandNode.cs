@@ -6,6 +6,6 @@ namespace SF.CommandModule
     public abstract class CommandNode : ICommand
     {
         public string Name;
-        public async virtual Awaitable Use() { }
+        public abstract Awaitable Use();
     }
 }

@@ -5,10 +5,8 @@ namespace SF.CommandModule
 {
     public class CommandController : MonoBehaviour
     {
-        [SerializeReference]
-        public List<CommandNode> Commands = new List<CommandNode>();
-
         [SerializeField] private bool DoStart = false;
+        [SerializeReference] public List<CommandNode> Commands = new List<CommandNode>();
 
         public void Awake()
         {
@@ -20,7 +18,7 @@ namespace SF.CommandModule
                 StartCommands();
         }
 
-        public async Awaitable StartCommands()
+        public async void StartCommands()
         {
             for (int i = 0; i < Commands.Count; i++)
             {

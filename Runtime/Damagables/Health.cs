@@ -7,6 +7,7 @@ namespace SF
 {
     public class Health : MonoBehaviour, IDamagable, EventListener<RespawnEvent>
     {
+        public bool IsPlayer = false;
         public CheckPointManager SpawnPoint;
 
         public CommandController CommandController;
@@ -34,7 +35,11 @@ namespace SF
 
         public void Kill()
         {
+            if (!IsPlayer)
+                return;
+
             RespawnEvent.Trigger(RespawnEventTypes.PlayerRespawn);
+            RespawnEvent.Trigger(RespawnEventTypes.GameObjectRespawn);
         }
 
 		public void OnEvent(RespawnEvent respawnEvent)
@@ -51,6 +56,7 @@ namespace SF
             if(SpawnPoint == null)
                 return;
             transform.position = SpawnPoint.CurrentCheckPoint.transform.position;
+            CurrentHealth = MaxHealth;
         }
 
 		private void OnEnable()

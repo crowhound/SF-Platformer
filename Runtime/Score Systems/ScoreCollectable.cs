@@ -16,7 +16,6 @@ namespace SF.CollectableModule
 			gameObject.SetActive(false);
         }
 
-
 		public void OnEvent(RespawnEvent respawnEvent)
 		{
 			switch(respawnEvent.EventType)
@@ -53,6 +52,5 @@ namespace SF.CollectableModule
 			this.EventStopListening<RespawnEvent>();
 			this.EventStopListening<CheckPointEvent>();
 		}
-
 	}
 }

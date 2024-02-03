@@ -21,7 +21,6 @@ namespace SF.CommandModule
         public async override Awaitable Use()
         {
             await StartMove();
-            Debug.Log("Movement Done");
         }
 
         public async Awaitable StartMove()

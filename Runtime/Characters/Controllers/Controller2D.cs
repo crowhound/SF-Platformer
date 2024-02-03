@@ -100,7 +100,7 @@ namespace SF.Characters.Controllers
 		}
 		public virtual void AddVerticalVelocity(float verticalVelocity)
 		{
-			_controllerVelocity.y += verticalVelocity;
+			_calculatedVelocity.y += verticalVelocity;
 		}
 		public virtual void SetHorizontalVelocity(float horizontalVelocity)
 		{

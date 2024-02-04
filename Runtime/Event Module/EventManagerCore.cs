@@ -120,7 +120,19 @@ namespace SF.Events
             }
             for (int i = 0; i < eventList.Count; i++)
             {
-                (eventList[i] as EventListener<EventType>).OnEvent(newEvent);
+                if (newEvent is not IValidationEvent)
+                {
+                    (eventList[i] as EventListener<EventType>).OnEvent(newEvent);
+                    // Continue skips the is valid call and goes to the next event needing called.
+                    continue;
+                }
+
+                // Event structs that have implemented the IValidationEvent can have custom validation code to run before full triggering the event. 
+                if((newEvent as IValidationEvent).IsValid())
+                {
+                    // If event is valid than tell the listeners to execute it.
+                    (eventList[i] as EventListener<EventType>).OnEvent(newEvent);
+                }
             }
         }
     }

@@ -1,3 +1,5 @@
+using System;
+using System.Collections.ObjectModel;
 using SF.Events;
 using UnityEngine;
 
@@ -5,8 +7,13 @@ namespace SF
 {
     [System.Serializable]
     public class LivesManager : EventListener<LivesEvent>
-    {
-        public int CurrentLives;
+    { 
+        public static int CurrentLives = 3;
+        private int _currentLives 
+        {
+            get { return CurrentLives;  }
+            set { CurrentLives = value; } 
+        }
         public int MaxLives = 99;
 
         public void OnEvent(LivesEvent livesEvent)
@@ -24,7 +31,14 @@ namespace SF
 
         private void ChangeLives(int lives)
         {
-            CurrentLives += lives;
+            _currentLives = Mathf.Clamp(_currentLives + lives , 0, MaxLives);
+            
+            if(_currentLives == 0)
+            {
+                // Do a game over event.
+                Debug.Log("YOU GOT GAMED OVER SON");
+            }
+            LivesEvent.Trigger(LivesEventTypes.ChangedLives);
         }
 
         public void RegisterEventListeners()

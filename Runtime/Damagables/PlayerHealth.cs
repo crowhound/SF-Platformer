@@ -8,6 +8,7 @@ namespace SF
 
         protected override void Kill()
         {
+            LivesEvent.Trigger(LivesEventTypes.DecreaseLives, 1);
             RespawnEvent.Trigger(RespawnEventTypes.PlayerRespawn);
             RespawnEvent.Trigger(RespawnEventTypes.GameObjectRespawn);
         }

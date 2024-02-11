@@ -4,7 +4,8 @@ namespace SF.Events
     {
         IncreaseLives,
         DecreaseLives,
-        SetLives
+        SetLives,
+        ChangedLives
     }
     public struct LivesEvent
     {
@@ -17,7 +18,7 @@ namespace SF.Events
         }
         static LivesEvent livesEvent;
 
-         public static void Trigger(LivesEventTypes eventType, int lives )
+         public static void Trigger(LivesEventTypes eventType, int lives = 0)
          {
             livesEvent.EventType = eventType;
             livesEvent.Lives = lives;

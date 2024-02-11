@@ -52,8 +52,9 @@ namespace SF
         {
             if(SpawnPoint == null)
                 return;
-
-            transform.position = SpawnPoint.CurrentCheckPoint.transform.position;
+            if(SpawnPoint.CurrentCheckPoint != null)
+                transform.position = SpawnPoint.CurrentCheckPoint.transform.position;
+            
             CurrentHealth = MaxHealth;
         }
 

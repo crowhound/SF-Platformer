@@ -5,6 +5,7 @@ namespace SF
 {
     public class Stomp : MonoBehaviour
     {
+        public float BounceVelocity = 5f;
         private Collider2D _collider2d;
         private GroundedController2D _controller2D;
         private void Awake()
@@ -22,7 +23,7 @@ namespace SF
                 if (_controller2D == null)
                     return;
 
-                _controller2D.SetVerticalVelocity(_controller2D.CurrentPhysics.JumpHeight);
+                _controller2D.SetVerticalVelocity(BounceVelocity);
             }
         }
     }

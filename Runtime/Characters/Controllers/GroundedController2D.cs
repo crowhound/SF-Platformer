@@ -32,7 +32,7 @@ namespace SF.Characters.Controllers
 		/// <summary>
 		/// Reference speed if used for passing in a value in horizontal calculatin based on running or not.
 		/// </summary>
-		protected float _referenceSpeed;
+		[NonSerialized] public float ReferenceSpeed;
 
 		[Header("Collision Settings")]
 		public ContactFilter2D PlatformFilter;
@@ -65,7 +65,7 @@ namespace SF.Characters.Controllers
 			if(DefaultPhysics.GroundSpeed > DefaultPhysics.GroundMaxSpeed)
 				DefaultPhysics.GroundSpeed = DefaultPhysics.GroundMaxSpeed;
 			CurrentPhysics = DefaultPhysics;
-			_referenceSpeed = CurrentPhysics.GroundSpeed;
+			ReferenceSpeed = CurrentPhysics.GroundSpeed;
 		}
 		#region Collision Calculations
 		protected override void ColisionChecks()
@@ -135,23 +135,17 @@ namespace SF.Characters.Controllers
 		{
 			if(Direction.x != 0)
 			{
-				_calculatedVelocity.x = _referenceSpeed * Direction.x;
+				// We only have to do a single clamp because than Direction.x takes care of it being negative or not when being multiplied.
+				ReferenceSpeed = Mathf.Clamp(ReferenceSpeed,0,CurrentPhysics.GroundMaxSpeed);
 
-				_calculatedVelocity.x = Direction.x > 0
-					? (_calculatedVelocity.x > CurrentPhysics.GroundMaxSpeed) // Moving Right
-						? CurrentPhysics.GroundMaxSpeed
-						: _calculatedVelocity.x
-					: (_calculatedVelocity.x <  -1 * CurrentPhysics.GroundMaxSpeed) // Moving Left
-						? -1 * CurrentPhysics.GroundMaxSpeed
-						: _calculatedVelocity.x;
+				_calculatedVelocity.x = ReferenceSpeed * Direction.x;
 
-				_calculatedVelocity.x = Direction.x > 0
-					? CollisionInfo.IsCollidingRight // Moving Right
-						? 0
-						: _calculatedVelocity.x
-					: CollisionInfo.IsCollidingLeft // Moving Left
-						? 0
-						: _calculatedVelocity.x;
+				// Moving right
+				if (Direction.x > 0 && CollisionInfo.IsCollidingRight)
+					_calculatedVelocity.x = 0;
+				// Moving left
+				else if (Direction.x < 0 && CollisionInfo.IsCollidingLeft)
+					_calculatedVelocity.x = 0;
 			}
 			else if(_controllerVelocity.x == 0)
 			{
@@ -194,9 +188,6 @@ namespace SF.Characters.Controllers
 			CurrentPhysics.GravityAcceleration = movementProperties.GravityAcceleration;
 			CurrentPhysics.TerminalVelocity = movementProperties.TerminalVelocity;
 			CurrentPhysics.MaxUpForce = movementProperties.MaxUpForce;
-			
-			CurrentPhysics.JumpHeight = movementProperties.JumpHeight;
-
 		}
 		protected override void CalculateMovementState()
 		{

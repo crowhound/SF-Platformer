@@ -1,38 +1,48 @@
 using System;
 using SF.Abilities.Characters;
+using SF.AbilityModule;
 using SF.Characters.Controllers;
+using SF.InputModule;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace SF.Abilities.CharacterModule
 {
-    [Serializable]
-    public class JumpAbility : CharacterAbility
+    public class JumpAbility : AbilityCore, IInputAbility
     {
-        [NonSerialized] private GroundedController2D _controller;
-        public JumpAbility(GameObject owner, GroundedController2D controller)
+        public JumpingPhysics JumpingPhysics;
+        protected override void OnInitialize()
         {
-            _owner = owner;
-
-            if (controller == null)
-                LoggingSystem.LogNullObject(_owner, typeof(Controller2D));
-
-            _controller = controller;
-            _controller.CurrentPhysics.ResetJumps();
-            _controller.OnGrounded += ResetJumps;
+            _controller2d.OnGrounded += ResetJumps;
         }
-        public void Use()
+        private void OnInputJump(InputAction.CallbackContext context)
+		{
+			if (IsEnabled == false || JumpingPhysics.JumpsRemaining < 1) return;
+
+            JumpingPhysics.JumpsRemaining--;
+
+			_controller2d.IsJumping = true;
+            _controller2d.IsFalling = false;
+            _controller2d.SetVerticalVelocity(JumpingPhysics.JumpHeight);
+		}
+
+		private void ResetJumps()
         {
-            if (IsEnabled == false || _controller.CurrentPhysics.JumpsRemaining < 1) return;
-
-            _controller.CurrentPhysics.JumpsRemaining--;
-
-			_controller.IsJumping = true;
-            _controller.IsFalling = false;
-            _controller.SetVerticalVelocity(_controller.CurrentPhysics.JumpHeight);
+            JumpingPhysics.ResetJumps();
         }
-        private void ResetJumps()
-        {
-            _controller.CurrentPhysics.ResetJumps();
-        }
+
+        private void OnEnable()
+		{
+			InputManager.Controls.Player.Enable();
+			InputManager.Controls.Player.Jump.performed += OnInputJump;
+		}
+
+        private void OnDisable()
+		{
+			if(InputManager.Instance == null) return;
+
+			InputManager.Controls.Player.Jump.performed -= OnInputJump;
+			_controller2d.OnGrounded -= ResetJumps;
+		}
     }
 }

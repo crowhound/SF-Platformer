@@ -4,7 +4,7 @@ namespace SF.Physics
     public struct MovementProperties
     {
         public float GroundSpeed;
-         public float GroundRunningSpeed;
+        public float GroundRunningSpeed;
         public float GroundAcceleration;
         public float GroundMaxSpeed;
 
@@ -13,9 +13,6 @@ namespace SF.Physics
         public float TerminalVelocity;
         public float MaxUpForce;
 
-        public float JumpHeight;
-        public int JumpAmount;
-        public int JumpsRemaining;
         public MovementProperties(
             float _groundSpeed = 5f,
             float _groundRunningSpeed = 7.5f,
@@ -24,9 +21,7 @@ namespace SF.Physics
             float _gravityScale = 1,
             float _gravityAcceleration = 9.8f,
             float _terminalVelocity = 20f,
-            float _maxUpForce = 15f,
-            float _jumpheight = 7f,
-            int _jumpAmount = 1)
+            float _maxUpForce = 15f)
         {
             GroundSpeed = _groundSpeed;
             GroundRunningSpeed = _groundRunningSpeed;
@@ -37,15 +32,6 @@ namespace SF.Physics
             GravityAcceleration = _gravityAcceleration;
             TerminalVelocity = _terminalVelocity;
             MaxUpForce = _maxUpForce;
-
-            JumpHeight = _jumpheight;
-            JumpAmount = _jumpAmount;
-            JumpsRemaining = _jumpAmount;
-        }
-
-        public void ResetJumps()
-        {
-            JumpsRemaining = JumpAmount;
         }
     }
 }

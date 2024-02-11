@@ -13,56 +13,11 @@ namespace SF.Characters.Controllers
 {
     public class PlayerController : GroundedController2D
     {
-
-		public JumpAbility JumpAbility;
-		#region Life cycles
-		private void OnEnable()
-		{
-			JumpAbility = new JumpAbility(gameObject, this);
-			InputManager.Controls.Player.Enable();
-			InputManager.Controls.Player.Move.performed += OnInputMove;
-			InputManager.Controls.Player.Move.canceled += OnInputMove;
-			InputManager.Controls.Player.Running.performed += OnMoveInputRun;
-			InputManager.Controls.Player.Running.canceled += OnMoveInputRun;
-			
-			InputManager.Controls.Player.Jump.performed += OnInputJump;
-		}
-
-        private void OnDisable()
-		{
-			if(InputManager.Instance == null) return;
-
-			InputManager.Controls.Player.Move.performed -= OnInputMove;
-			InputManager.Controls.Player.Move.canceled -= OnInputMove;
-			InputManager.Controls.Player.Running.performed -= OnMoveInputRun;
-			InputManager.Controls.Player.Running.canceled -= OnMoveInputRun;
-			InputManager.Controls.Player.Jump.performed -= OnInputJump;
-		}
-		#endregion
 		public void UpdateBounds()
 		{
 			if(_boxCollider != null)
 				_boundsData.UpdateBounds(_boxCollider);
 		}
-		#region Input Actions
-		private void OnInputMove(InputAction.CallbackContext context)
-		{
-			Vector2 input = context.ReadValue<Vector2>();
-
-			Direction.x = input.x != 0 ? input.x : 0;
-		}
-		private void OnMoveInputRun(InputAction.CallbackContext context)
-        {
-			IsRunning = context.ReadValue<float>() > 0;
-			_referenceSpeed = IsRunning
-			? CurrentPhysics.GroundRunningSpeed
-			: CurrentPhysics.GroundSpeed;
-        }
-		private void OnInputJump(InputAction.CallbackContext context)
-		{
-			JumpAbility.Use();
-		}
-		#endregion
 		
 #if UNITY_EDITOR
 		public void OnDrawGizmos()

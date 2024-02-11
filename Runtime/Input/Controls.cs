@@ -74,6 +74,15 @@ namespace SF.InputModule
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PowerUp"",
+                    ""type"": ""Button"",
+                    ""id"": ""daf29369-d9c4-4816-946a-b65ca903f6c4"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -327,6 +336,28 @@ namespace SF.InputModule
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Running"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""dd9a96f3-d0f7-4619-9ef8-65d3961a7b4f"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard"",
+                    ""action"": ""PowerUp"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ae2aeb66-da9f-4667-80eb-0d8eb12c844f"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Controller"",
+                    ""action"": ""PowerUp"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -891,6 +922,7 @@ namespace SF.InputModule
             m_Player_Fire = m_Player.FindAction("Fire", throwIfNotFound: true);
             m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
             m_Player_Running = m_Player.FindAction("Running", throwIfNotFound: true);
+            m_Player_PowerUp = m_Player.FindAction("PowerUp", throwIfNotFound: true);
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
             m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -975,6 +1007,7 @@ namespace SF.InputModule
         private readonly InputAction m_Player_Fire;
         private readonly InputAction m_Player_Jump;
         private readonly InputAction m_Player_Running;
+        private readonly InputAction m_Player_PowerUp;
         public struct PlayerActions
         {
             private @Controls m_Wrapper;
@@ -984,6 +1017,7 @@ namespace SF.InputModule
             public InputAction @Fire => m_Wrapper.m_Player_Fire;
             public InputAction @Jump => m_Wrapper.m_Player_Jump;
             public InputAction @Running => m_Wrapper.m_Player_Running;
+            public InputAction @PowerUp => m_Wrapper.m_Player_PowerUp;
             public InputActionMap Get() { return m_Wrapper.m_Player; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -1008,6 +1042,9 @@ namespace SF.InputModule
                 @Running.started += instance.OnRunning;
                 @Running.performed += instance.OnRunning;
                 @Running.canceled += instance.OnRunning;
+                @PowerUp.started += instance.OnPowerUp;
+                @PowerUp.performed += instance.OnPowerUp;
+                @PowerUp.canceled += instance.OnPowerUp;
             }
 
             private void UnregisterCallbacks(IPlayerActions instance)
@@ -1027,6 +1064,9 @@ namespace SF.InputModule
                 @Running.started -= instance.OnRunning;
                 @Running.performed -= instance.OnRunning;
                 @Running.canceled -= instance.OnRunning;
+                @PowerUp.started -= instance.OnPowerUp;
+                @PowerUp.performed -= instance.OnPowerUp;
+                @PowerUp.canceled -= instance.OnPowerUp;
             }
 
             public void RemoveCallbacks(IPlayerActions instance)
@@ -1196,6 +1236,7 @@ namespace SF.InputModule
             void OnFire(InputAction.CallbackContext context);
             void OnJump(InputAction.CallbackContext context);
             void OnRunning(InputAction.CallbackContext context);
+            void OnPowerUp(InputAction.CallbackContext context);
         }
         public interface IUIActions
         {

@@ -3,16 +3,12 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 using UnityEngine;
-using UnityEngine.InputSystem;
-
-using SF.InputModule;
-using SF.Abilities.CharacterModule;
-
 
 namespace SF.Characters.Controllers
 {
-    public class PlayerController : GroundedController2D
+	public class PlayerController : GroundedController2D
     {
+
 		public void UpdateBounds()
 		{
 			if(_boxCollider != null)

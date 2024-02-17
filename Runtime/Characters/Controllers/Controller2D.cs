@@ -32,6 +32,8 @@ namespace SF.Characters.Controllers
 		/// </summary>
 		public void Init()
 		{
+			// I think I should add the collider assignment here.
+			// Even flying enemies need colliders to hurt the player. 
 			_rigidbody2D = _rigidbody2D != null ? _rigidbody2D : GetComponent<Rigidbody2D>();
 		}
 		protected virtual void OnInit()
@@ -117,6 +119,10 @@ namespace SF.Characters.Controllers
 		}
 		#endregion
 
+		public void ChangeDirection()
+		{
+			Direction *= -1;
+		}
 		protected virtual void Reset()
 		{
 			_rigidbody2D = GetComponent<Rigidbody2D>();

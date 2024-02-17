@@ -8,7 +8,7 @@ namespace SF
         ScoreDecrease,
         ScoreSet
     }
-    public struct ScoreEvent
+    public struct ScoreEvent : IEvent
     {
         public ScoreEventTypes EventType;
         public float ScoreChange;

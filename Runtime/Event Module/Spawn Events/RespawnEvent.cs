@@ -11,7 +11,7 @@ namespace SF.Events
         PlayerRespawn,
         GameObjectRespawn, // This is used for respawning a single specific game object of any type.
     }
-    public struct RespawnEvent
+    public struct RespawnEvent : IEvent
     {
         public RespawnEventTypes EventType;
         public GameObject RespawnGameObject;

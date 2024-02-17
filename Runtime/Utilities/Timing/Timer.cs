@@ -3,12 +3,15 @@ using UnityEngine;
 
 namespace SF
 {
-    [System.Serializable]
+    [Serializable]
     public class Timer
     {
         public float StartingTime = 3;
         public float RemaingTime;
 
+        /// <summary>
+        /// An Action that is called at the end when the Timer hits 0.
+        /// </summary>
         private Action _onTimerComplete;
         public Timer(Action onTimerComplete = null)
         {

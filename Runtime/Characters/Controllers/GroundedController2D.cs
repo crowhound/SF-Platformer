@@ -72,10 +72,14 @@ namespace SF.Characters.Controllers
 		{
 			_wasGroundedLastFrame = IsGrounded;
 			GroundChecks();
+			CeilingChecks();
 			SideCollisionChecks();
 		}
 		protected virtual void GroundChecks()
 		{
+			// This will eventually also show colliding with other things than platforms.
+			CollisionInfo.IsCollidingBelow = RaycastMultiple(_boundsData.BottomLeft, _boundsData.BottomRight, Vector2.down, CollisionController.VerticalRayDistance, PlatformFilter, CollisionController.VerticalRayAmount);
+
 			if(IsJumping)
 			{
 				IsGrounded = false;
@@ -83,8 +87,7 @@ namespace SF.Characters.Controllers
 			}
 			IsGrounded = RaycastMultiple(_boundsData.BottomLeft, _boundsData.BottomRight ,Vector2.down, CollisionController.VerticalRayDistance, PlatformFilter, CollisionController.VerticalRayAmount);
 
-			// This will eventually also show colliding with other things than platforms.
-			CollisionInfo.IsCollidingBelow = RaycastMultiple(_boundsData.BottomLeft, _boundsData.BottomRight ,Vector2.down, CollisionController.VerticalRayDistance, PlatformFilter, CollisionController.VerticalRayAmount);
+			
 
 			//StandingOnObject = (GroundedHit) ? GroundedHit.collider.gameObject : null;
 
@@ -94,7 +97,10 @@ namespace SF.Characters.Controllers
 				OnGrounded?.Invoke();
 			}
 		}
-
+		protected virtual void CeilingChecks()
+		{
+			CollisionInfo.IsCollidingAbove = RaycastMultiple(_boundsData.TopLeft, _boundsData.TopRight, Vector2.up, CollisionController.VerticalRayDistance, PlatformFilter, CollisionController.VerticalRayAmount);
+		}
 		public bool RaycastMultiple(Vector2 origin, Vector2 end, Vector2 direction, float distance, LayerMask layerMask, int numberOfRays = 4)
 		{
 			bool hasHit = false;

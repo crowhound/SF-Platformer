@@ -9,9 +9,9 @@
   ],
   "category": "2d",
   "dependencies": {
+    "com.unity.inputsystem": "1.7.0"
   },
-  "relatedPackages": {
-  },
+  "relatedPackages": {},
   "_upm": {
     "changelog": ""
   },

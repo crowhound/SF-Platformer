@@ -6,19 +6,7 @@ using System;
 
 namespace SF.Characters.Controllers
 {
-	[System.Serializable]
-	public struct CollisionInfo
-	{
-		public RaycastHit2D GroundedHit;
-		public RaycastHit2D CeilingHit;
-		public RaycastHit2D RightHit;
-		public RaycastHit2D LeftHit;
 
-		public bool IsCollidingRight;
-		public bool IsCollidingLeft;
-		public bool IsCollidingAbove;
-		public bool IsCollidingBelow;
-	}
 
 	[RequireComponent(typeof(BoxCollider2D))]
 	public class GroundedController2D : Controller2D
@@ -38,9 +26,6 @@ namespace SF.Characters.Controllers
 		public ContactFilter2D PlatformFilter;
 		public GameObject StandingOnObject;
 
-		public CollisionInfo CollisionInfo;
-		public CollisionController CollisionController = new(0.05f,0.02f,3,4);
-		
 
 		[Header("Booleans")]
 		public bool IsGrounded = false;
@@ -49,16 +34,17 @@ namespace SF.Characters.Controllers
 		public bool IsSwimming = false;
 		public bool IsJumping = false;
 		public bool IsFalling = false;
-		#region Components 
-		protected BoxCollider2D _boxCollider;
+
 
 		public Action OnGrounded;
+
+		#region Components 
+		protected BoxCollider2D _boxCollider;
 		#endregion
 		protected override void OnAwake()
 		{
 			_boxCollider = GetComponent<BoxCollider2D>();
 			_boundsData.Bounds = _boxCollider.bounds;
-			
 		}
 		protected override void OnStart()
 		{
@@ -74,6 +60,7 @@ namespace SF.Characters.Controllers
 			GroundChecks();
 			CeilingChecks();
 			SideCollisionChecks();
+			CheckOnCollisionActions();
 		}
 		protected virtual void GroundChecks()
 		{
@@ -101,6 +88,16 @@ namespace SF.Characters.Controllers
 		{
 			CollisionInfo.IsCollidingAbove = RaycastMultiple(_boundsData.TopLeft, _boundsData.TopRight, Vector2.up, CollisionController.VerticalRayDistance, PlatformFilter, CollisionController.VerticalRayAmount);
 		}
+
+		protected virtual void SideCollisionChecks()
+		{
+			// Right Side
+			CollisionInfo.IsCollidingRight = RaycastMultiple(_boundsData.TopRight, _boundsData.BottomRight, Vector2.right, CollisionController.HoriztonalRayDistance, PlatformFilter, CollisionController.HoriztonalRayAmount);
+
+			// Left Side
+			CollisionInfo.IsCollidingLeft = RaycastMultiple(_boundsData.TopLeft, _boundsData.BottomLeft, Vector2.left, CollisionController.HoriztonalRayDistance, PlatformFilter, CollisionController.HoriztonalRayAmount);
+		}
+
 		public bool RaycastMultiple(Vector2 origin, Vector2 end, Vector2 direction, float distance, LayerMask layerMask, int numberOfRays = 4)
 		{
 			bool hasHit = false;
@@ -124,14 +121,6 @@ namespace SF.Characters.Controllers
 			return RaycastMultiple(origin, end, direction, distance, contactFilter2D.layerMask, numberOfRays);
 		}
 
-		protected virtual void SideCollisionChecks()
-		{
-			// Right Side
-			CollisionInfo.IsCollidingRight = RaycastMultiple(_boundsData.TopRight, _boundsData.BottomRight ,Vector2.right, CollisionController.HoriztonalRayDistance, PlatformFilter, CollisionController.HoriztonalRayAmount);
-
-			// Left Side
-			CollisionInfo.IsCollidingLeft = RaycastMultiple(_boundsData.TopLeft, _boundsData.BottomLeft ,Vector2.left, CollisionController.HoriztonalRayDistance, PlatformFilter, CollisionController.HoriztonalRayAmount);
-		}
 		#endregion
 		protected override void OnPreFixedUpdate()
 		{

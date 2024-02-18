@@ -1,6 +1,9 @@
-using SF.Physics.Helpers;
-
 using UnityEngine;
+
+using SF.Physics.Helpers;
+using SF.Physics.Collision;
+
+
 
 namespace SF.Characters.Controllers
 {
@@ -14,10 +17,14 @@ namespace SF.Characters.Controllers
 		protected Vector2 _calculatedVelocity;
 		protected Vector2 _previousVelocity;
 		protected Vector2 _controllerVelocity;
+		
 		#region Components 
 		protected BoundsData _boundsData;
 		protected Rigidbody2D _rigidbody2D;
 		#endregion
+
+		public CollisionInfo CollisionInfo;
+		public CollisionController CollisionController = new(0.05f, 0.02f, 3, 4);
 
 		#region Lifecycle Methods
 		private void Awake()
@@ -56,6 +63,13 @@ namespace SF.Characters.Controllers
 		{
 			OnPreFixedUpdate();
 			_previousVelocity = _calculatedVelocity;
+
+			// Set the bools for what sides there was a collision on last frame.
+			CollisionInfo.WasCollidingRight = CollisionInfo.IsCollidingRight;
+			CollisionInfo.WasCollidingLeft = CollisionInfo.IsCollidingLeft;
+			CollisionInfo.WasCollidingAbove = CollisionInfo.IsCollidingAbove;
+			CollisionInfo.WasCollidingBelow = CollisionInfo.IsCollidingBelow;
+
 			ColisionChecks();
 			CalculateHorizontal();
 			CalculateVertical();
@@ -119,6 +133,29 @@ namespace SF.Characters.Controllers
 		}
 		#endregion
 
+		/// <summary>
+		/// Checks to see what sides might have a new collision that was started the current frame. If a new collision is detected on the side invoke the action related to that sides collisions.
+		/// </summary>
+		protected virtual void CheckOnCollisionActions()
+		{
+			// If we were not colliding on a side with anything last frame, but is now Invoke the OnCollisionActions.
+
+			// Right Side
+			if(!CollisionInfo.WasCollidingRight && CollisionInfo.IsCollidingRight)
+				CollisionInfo.OnCollidedRight?.Invoke();
+
+			// Left Side
+			if(!CollisionInfo.WasCollidingLeft && CollisionInfo.IsCollidingLeft)
+				CollisionInfo.OnCollidedLeft?.Invoke();
+
+			// Above Side
+			if(!CollisionInfo.WasCollidingAbove && CollisionInfo.IsCollidingAbove)
+				CollisionInfo.OnCollidedAbove?.Invoke();
+
+			//Below Side
+			if(!CollisionInfo.WasCollidingBelow && CollisionInfo.IsCollidingBelow)
+				CollisionInfo.OnCollidedBelow?.Invoke();
+		}
 		public void ChangeDirection()
 		{
 			Direction *= -1;

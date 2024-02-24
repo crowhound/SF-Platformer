@@ -1,9 +1,11 @@
+using System;
+
 using UnityEngine;
 
 using SF.Physics.Helpers;
 using SF.Physics.Collision;
-using System;
 
+using SF.Character.Core;
 
 
 namespace SF.Characters.Controllers
@@ -12,6 +14,9 @@ namespace SF.Characters.Controllers
 	public class Controller2D : MonoBehaviour
 	{
 		public bool IsDebugModeActivated;
+
+		[Header("States")]
+		public CharacterState CharacterState;
 
 		public Vector2 Direction
 		{

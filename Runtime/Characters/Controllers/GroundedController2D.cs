@@ -11,9 +11,6 @@ namespace SF.Characters.Controllers
 	[RequireComponent(typeof(BoxCollider2D))]
 	public class GroundedController2D : Controller2D
     {
-		[Header("States")]
-		public CharacterState CharacterState;
-
 		[Header("Physics Properties")]
 		public MovementProperties DefaultPhysics = new(5);
 		public MovementProperties CurrentPhysics = new(0);

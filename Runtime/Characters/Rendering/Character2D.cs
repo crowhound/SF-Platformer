@@ -1,3 +1,5 @@
+using System;
+
 using SF.Abilities.Characters;
 using SF.Character.Core;
 using SF.Characters.Controllers;
@@ -15,15 +17,13 @@ namespace SF.Characters
 		public CharacterTypes CharacterType = CharacterTypes.Player;
 		public CharacterState CharacterState;
 
+		public bool FacingRight = true;
 		#region Common Components
 		protected SpriteRenderer _spriteRend;
 		protected Animator _animator;
 		protected Controller2D _controller;
 		#endregion
 
-		#region Character Abilities
-		//public AbilityController AbilityController;
-		#endregion
 		private int _animationHash;
 
 		#region Lifecycle Functions  
@@ -42,7 +42,9 @@ namespace SF.Characters
 		
 		protected virtual void OnInit()
 		{
+			_controller.OnDirectionChanged += OnDirectionChanged;
 		}
+
 		private void LateUpdate()
 		{
 			UpdateAnimator(); 
@@ -53,15 +55,8 @@ namespace SF.Characters
 		}
 		protected virtual void SetAnimations()
 		{
-			// Need to debug the 40 bytes being allocated here. 
-			CharacterState.MovementState = _controller switch
-			{
-				PlayerController playerController =>
-					CharacterState.MovementState = playerController.CharacterState.MovementState,
-				GroundedController2D groundedController =>
-					CharacterState.MovementState = groundedController.CharacterState.MovementState,
-				_ => MovementState.Idle
-			};
+			CharacterState.MovementState = _controller.CharacterState.MovementState;
+
 			_animationHash = Animator.StringToHash(CharacterState.MovementState.ToString());
 
 			if(_animator.HasState(0, _animationHash))
@@ -70,22 +65,16 @@ namespace SF.Characters
 			}
 		}
 
-
-		private void OnInputMove(InputAction.CallbackContext context)
+		private void SpriteFlip(Vector2 direction)
 		{
-			Vector2 input = context.ReadValue<Vector2>();
-			_spriteRend.flipX = input.x <= 0;
+			direction *= (FacingRight) ? 1 : -1;
+			_spriteRend.flipX = direction.x <= 0;
 		}
 
-		private void OnEnable()
+
+		private void OnDirectionChanged(object sender, Vector2 direction)
 		{
-			InputManager.Controls.Player.Enable();
-			InputManager.Controls.Player.Move.performed += OnInputMove;
-		}
-		private void OnDisable()
-		{
-			if(InputManager.Instance == null) return;
-			InputManager.Controls.Player.Move.performed -= OnInputMove;
+			SpriteFlip(direction);
 		}
 	}
 }

@@ -2,6 +2,7 @@ using UnityEngine;
 
 using SF.Physics.Helpers;
 using SF.Physics.Collision;
+using System;
 
 
 
@@ -12,7 +13,18 @@ namespace SF.Characters.Controllers
 	{
 		public bool IsDebugModeActivated;
 
-		public Vector2 Direction;
+		public Vector2 Direction
+		{
+			get { return _direction; }
+			set 
+			{ 
+				_direction = value;
+				OnDirectionChanged?.Invoke(this, _direction);
+			}
+		}
+		private Vector2 _direction;
+		public EventHandler<Vector2> OnDirectionChanged;
+
 		[field:SerializeField] public Vector2 Velocity { get; protected set; }
 		protected Vector2 _calculatedVelocity;
 		protected Vector2 _previousVelocity;

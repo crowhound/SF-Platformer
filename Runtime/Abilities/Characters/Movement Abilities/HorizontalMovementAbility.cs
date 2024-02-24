@@ -11,7 +11,8 @@ namespace SF.Abilities.Characters
 		{
 			Vector2 input = context.ReadValue<Vector2>();
 
-			_controller2d.Direction.x = input.x != 0 ? input.x : 0;
+			float xDirection = input.x != 0 ? input.x : 0;
+			_controller2d.Direction = new Vector2(xDirection,0);
 		}
         private void OnMoveInputRun(InputAction.CallbackContext context)
         {

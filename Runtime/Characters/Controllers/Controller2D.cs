@@ -29,19 +29,20 @@ namespace SF.Characters.Controllers
 		}
 		private Vector2 _direction;
 		public EventHandler<Vector2> OnDirectionChanged;
-
-		[field:SerializeField] public Vector2 Velocity { get; protected set; }
-		protected Vector2 _calculatedVelocity;
-		protected Vector2 _previousVelocity;
-		protected Vector2 _controllerVelocity;
 		
 		#region Components 
 		protected BoundsData _boundsData;
 		protected Rigidbody2D _rigidbody2D;
 		#endregion
 
+		[Header("Collision Data")]
 		public CollisionInfo CollisionInfo;
 		public CollisionController CollisionController = new(0.05f, 0.02f, 3, 4);
+
+		[field: SerializeField] public Vector2 Velocity { get; protected set; }
+		protected Vector2 _calculatedVelocity;
+		protected Vector2 _previousVelocity;
+		protected Vector2 _controllerVelocity;
 
 		#region Lifecycle Methods
 		private void Awake()

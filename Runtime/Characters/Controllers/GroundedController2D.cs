@@ -19,7 +19,7 @@ namespace SF.Characters.Controllers
 		/// </summary>
 		[NonSerialized] public float ReferenceSpeed;
 
-		[Header("Collision Settings")]
+		[Header("Platform Settings")]
 		public ContactFilter2D PlatformFilter;
 		public GameObject StandingOnObject;
 

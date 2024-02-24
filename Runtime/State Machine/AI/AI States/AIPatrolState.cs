@@ -13,7 +13,7 @@ namespace SF.AI
 		{
 			controller = AIBrain.GetComponent<Controller2D>();
 			character = AIBrain.GetComponent<Character2D>();
-			controller.Direction.x = 1;
+			
 		}
 
 		protected override void OnUpdateState(Controller2D controller)

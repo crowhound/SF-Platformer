@@ -1,12 +1,7 @@
-using System;
-
-using SF.Abilities.Characters;
 using SF.Character.Core;
 using SF.Characters.Controllers;
-using SF.InputModule;
 
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace SF.Characters
 {
@@ -15,16 +10,16 @@ namespace SF.Characters
     {
 		public enum CharacterTypes { Player, Ally, Enemy, NPC}
 		public CharacterTypes CharacterType = CharacterTypes.Player;
-		public CharacterState CharacterState;
+		public CharacterState CharacterState => _controller.CharacterState;
 
 		public bool FacingRight = true;
 		#region Common Components
-		protected SpriteRenderer _spriteRend;
-		protected Animator _animator;
-		protected Controller2D _controller;
+		private SpriteRenderer _spriteRend;
+		private Animator _animator;
+		private Controller2D _controller;
 		#endregion
 
-		private int _animationHash;
+		private int AnimationHash => Animator.StringToHash(CharacterState.MovementState.ToString());
 
 		#region Lifecycle Functions  
 		private void Awake()
@@ -49,19 +44,15 @@ namespace SF.Characters
 		{
 			UpdateAnimator(); 
 		}
-		protected virtual void UpdateAnimator()
+		private void UpdateAnimator()
 		{
 			SetAnimations();
 		}
-		protected virtual void SetAnimations()
+		private void SetAnimations()
 		{
-			CharacterState.MovementState = _controller.CharacterState.MovementState;
-
-			_animationHash = Animator.StringToHash(CharacterState.MovementState.ToString());
-
-			if(_animator.HasState(0, _animationHash))
+			if(_animator.HasState(0, AnimationHash))
 			{
-				_animator.CrossFade(_animationHash, 0);
+				_animator.CrossFade(AnimationHash, 0);
 			}
 		}
 
@@ -70,7 +61,6 @@ namespace SF.Characters
 			direction *= (FacingRight) ? 1 : -1;
 			_spriteRend.flipX = direction.x <= 0;
 		}
-
 
 		private void OnDirectionChanged(object sender, Vector2 direction)
 		{

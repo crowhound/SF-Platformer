@@ -9,12 +9,7 @@ namespace SF.Characters.Controllers
 	public class PlayerController : GroundedController2D
     {
 
-		public void UpdateBounds()
-		{
-			if(_boxCollider != null)
-				_boundsData.UpdateBounds(_boxCollider);
-		}
-		
+
 #if UNITY_EDITOR
 		public void OnDrawGizmos()
 		{

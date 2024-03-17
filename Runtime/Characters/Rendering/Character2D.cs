@@ -12,7 +12,7 @@ namespace SF.Characters
 		public CharacterTypes CharacterType = CharacterTypes.Player;
 		public CharacterState CharacterState => _controller.CharacterState;
 
-		public bool FacingRight = true;
+		public bool StartedFacingRight = true;
 		#region Common Components
 		private SpriteRenderer _spriteRend;
 		private Animator _animator;
@@ -37,7 +37,7 @@ namespace SF.Characters
 		
 		protected virtual void OnInit()
 		{
-			_controller.OnDirectionChanged += OnDirectionChanged;
+            _controller.OnDirectionChanged += OnDirectionChanged;
 		}
 
 		private void LateUpdate()
@@ -58,12 +58,15 @@ namespace SF.Characters
 
 		private void SpriteFlip(Vector2 direction)
 		{
-			direction *= (FacingRight) ? 1 : -1;
-			_spriteRend.flipX = direction.x <= 0;
-		}
+			_spriteRend.flipX = StartedFacingRight
+				? (direction.x > 0)
+				: (direction.x < 0);
+        }
 
 		private void OnDirectionChanged(object sender, Vector2 direction)
 		{
+			if(direction.x == 0)
+				return;
 			SpriteFlip(direction);
 		}
 	}

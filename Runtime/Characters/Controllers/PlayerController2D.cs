@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
+using SF.Utilities;
+
 using UnityEngine;
 
 namespace SF.Characters.Controllers
@@ -16,12 +18,12 @@ namespace SF.Characters.Controllers
 			if(!IsDebugModeActivated) return;
 
 			_boxCollider = (_boxCollider == null) ? GetComponent<BoxCollider2D>() : _boxCollider;
-			_boundsData.Bounds = _boxCollider.bounds;
+			Bounds = _boxCollider.bounds;
 			Vector2 startPosition;
 			float stepPercent;
 			int numberOfRays = CollisionController.VerticalRayAmount;
-			Vector2 origin = _boundsData.BottomLeft;
-			Vector2 end = _boundsData.BottomRight;
+			Vector2 origin = Bounds.BottomLeft();
+			Vector2 end = Bounds.BottomRight();
 			List<Vector3> listOfPoints = new();
 
 			for(int x = 0; x < numberOfRays; x++) // Down
@@ -33,8 +35,8 @@ namespace SF.Characters.Controllers
 			}
 
 			numberOfRays = CollisionController.HoriztonalRayAmount;
-			origin = _boundsData.TopRight; 
-			end = _boundsData.BottomRight;
+			origin = Bounds.TopRight(); 
+			end = Bounds.BottomRight();
 
 			for(int x = 0; x < numberOfRays; x++) // Right
 			{

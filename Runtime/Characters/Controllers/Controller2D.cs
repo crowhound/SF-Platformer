@@ -31,7 +31,7 @@ namespace SF.Characters.Controllers
 		public EventHandler<Vector2> OnDirectionChanged;
 		
 		#region Components 
-		protected BoundsData _boundsData;
+		[NonSerialized] public Bounds Bounds;
 		protected Rigidbody2D _rigidbody2D;
 		#endregion
 

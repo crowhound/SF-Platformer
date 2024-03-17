@@ -59,8 +59,9 @@ namespace SF.Characters
 		private void SpriteFlip(Vector2 direction)
 		{
 			_spriteRend.flipX = StartedFacingRight
-				? (direction.x > 0)
-				: (direction.x < 0);
+				? (!(direction.x > 0))
+				: (!(direction.x < 0));
+
         }
 
 		private void OnDirectionChanged(object sender, Vector2 direction)

@@ -1,7 +1,8 @@
 {
-    "name": "SF.Platformer.Runtime",
+    "name": "SF.Platformer",
     "rootNamespace": "SF",
     "references": [
+        "Unity.Cinemachine",
         "Unity.InputSystem",
         "Unity.TextMeshPro",
         "UnityEngine.UI",

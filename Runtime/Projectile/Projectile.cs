@@ -26,7 +26,7 @@ namespace SF.ProjectileModule
             
             var projectile =  GameObject.Instantiate(ProjectileObject, spawnPoint, Quaternion.identity);
 
-            projectile.GetComponent<Rigidbody2D>().velocity = new Vector2(ProjectileSpeed, 0);
+            projectile.GetComponent<Rigidbody2D>().linearVelocity = new Vector2(ProjectileSpeed, 0);
         }
 
         private void CooldownCompleted()

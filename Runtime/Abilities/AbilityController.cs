@@ -16,10 +16,7 @@ namespace SF.AbilityModule
         {
             Abilities = GetComponents<AbilityCore>().ToList();
 
-            if (AbilityOwner != null)
-                _controller2D = AbilityOwner.GetComponent<Controller2D>();
-            else
-                _controller2D = GetComponent<Controller2D>();
+            _controller2D = AbilityOwner != null ? AbilityOwner.GetComponent<Controller2D>() : GetComponent<Controller2D>();
         }
         private void Start()
         {

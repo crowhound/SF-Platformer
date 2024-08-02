@@ -18,8 +18,8 @@ namespace SF.Abilities.Characters
         {
 			_controller2d.IsRunning = context.ReadValue<float>() > 0;
 			_controller2d.ReferenceSpeed = _controller2d.IsRunning
-			? _controller2d.CurrentPhysics.GroundRunningSpeed
-			: _controller2d.CurrentPhysics.GroundSpeed;
+				? _controller2d.CurrentPhysics.GroundRunningSpeed
+				: _controller2d.CurrentPhysics.GroundSpeed;
         }
         #endregion Input Actions
         private void OnEnable()

@@ -66,6 +66,6 @@ namespace SF
             this.EventStopListening<ScoreEvent>();
             this.EventStopListening<RespawnEvent>();
         }
-		#endregion
-	}
+        #endregion
+    }
 }

@@ -1,5 +1,3 @@
-using SF.Events;
-
 namespace SF.SwitchesModule
 {
     public class PSwitch : UnityEngine.MonoBehaviour, IStompable

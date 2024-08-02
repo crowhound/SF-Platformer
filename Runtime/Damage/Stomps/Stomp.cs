@@ -8,6 +8,7 @@ namespace SF
         public float BounceVelocity = 5f;
         private Collider2D _collider2d;
         private GroundedController2D _controller2D;
+
         private void Awake()
         {
             _collider2d = GetComponent<Collider2D>();
@@ -24,6 +25,17 @@ namespace SF
                     return;
 
                 _controller2D.SetVerticalVelocity(BounceVelocity);
+            }
+        }
+
+        public void OnCollisionEnter2D(Collision2D collision)
+        {
+            if(collision.collider.TryGetComponent(out IStompable stompable))
+            {
+                if(_collider2d.Distance(collision.collider).normal.y < 0)
+                {
+                    stompable.Stomp();
+                }
             }
         }
     }

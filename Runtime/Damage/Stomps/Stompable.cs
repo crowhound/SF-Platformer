@@ -7,7 +7,7 @@ namespace SF
         private IDamagable _health;
         private void Awake()
         {
-            _health = GetComponent<Health>();
+            TryGetComponent(out _health);
         }
         public void Stomp()
         {

@@ -2,20 +2,22 @@ using System;
 
 using UnityEngine;
 
-using SF.Physics.Helpers;
 using SF.Physics.Collision;
 
 using SF.Character.Core;
+using SF.Physics;
 
 
 namespace SF.Characters.Controllers
 {
     [RequireComponent(typeof(Rigidbody2D))]
-	public class Controller2D : MonoBehaviour
+	public class Controller2D : MonoBehaviour, IForceReciever
 	{
-		public bool IsDebugModeActivated;
+        [Header("Physics Properties")]
+        public MovementProperties DefaultPhysics = new(5);
+        public MovementProperties CurrentPhysics = new(0);
 
-		[Header("States")]
+        [Header("States")]
 		public CharacterState CharacterState;
 
 		public Vector2 Direction
@@ -39,10 +41,14 @@ namespace SF.Characters.Controllers
 		public CollisionInfo CollisionInfo;
 		public CollisionController CollisionController = new(0.05f, 0.02f, 3, 4);
 
-		[field: SerializeField] public Vector2 Velocity { get; protected set; }
+		/// <summary>
+		/// The overall velocity to be added this frame.
+		/// </summary>
 		protected Vector2 _calculatedVelocity;
-		protected Vector2 _previousVelocity;
-		protected Vector2 _controllerVelocity;
+		/// <summary>
+		/// Velocity adding through external physics forces such as gravity and interactable objects.
+		/// </summary>
+		protected Vector2 _externalVelocity;
 
 		#region Lifecycle Methods
 		private void Awake()
@@ -60,7 +66,10 @@ namespace SF.Characters.Controllers
 			// I think I should add the collider assignment here.
 			// Even flying enemies need colliders to hurt the player. 
 			_rigidbody2D = _rigidbody2D != null ? _rigidbody2D : GetComponent<Rigidbody2D>();
-		}
+
+            _rigidbody2D.freezeRotation = true;
+			OnInit();
+        }
 		protected virtual void OnInit()
 		{
 
@@ -71,6 +80,8 @@ namespace SF.Characters.Controllers
 		}
 		private void Start()
 		{
+			// Need to check why this is in twice. Gravity Scale is being set also in OnAwake.
+			_rigidbody2D.gravityScale = 0;
 			OnStart();
 		}
 		protected virtual void OnStart()
@@ -79,8 +90,7 @@ namespace SF.Characters.Controllers
 		}
 		private void FixedUpdate()
 		{
-			OnPreFixedUpdate();
-			_previousVelocity = _calculatedVelocity;
+            OnPreFixedUpdate();
 
 			// Set the bools for what sides there was a collision on last frame.
 			CollisionInfo.WasCollidingRight = CollisionInfo.IsCollidingRight;
@@ -104,16 +114,15 @@ namespace SF.Characters.Controllers
 		#region Movement Calculations
 		protected virtual void Move()
 		{
-			_rigidbody2D.velocity = _calculatedVelocity;
-			/*
-			  The old way of doing it. Converted over to use per velocity to match the standard of non kinematic rigidbodies being moved with velocity. 
+			if(_externalVelocity != Vector2.zero)
+			{
+				_calculatedVelocity = _externalVelocity;
+				_externalVelocity = Vector2.zero;
+			}
 
-			 Will need to keep an eye on things that change the vertical velocity through code and not through Unity's Gravity physic step. 
-			 
-			_rigidbody2D.MovePosition( (Vector2)transform.position + _calculatedVelocity * Time.fixedDeltaTime);
-			*/
-			Velocity = _calculatedVelocity;
-		}
+			_rigidbody2D.linearVelocity = _calculatedVelocity;
+        }
+
 		protected virtual void ColisionChecks()
 		{
 
@@ -124,13 +133,17 @@ namespace SF.Characters.Controllers
 		protected virtual void CalculateVertical()
 		{
 		}
+		public void SetExternalVelocity(Vector2 force)
+		{
+			_externalVelocity = force;
+		}
 		public virtual void AddVelocity(Vector2 velocity)
 		{
-			_controllerVelocity += velocity;
+            _externalVelocity += velocity;
 		}
 		public virtual void AddHorizontalVelocity(float horizontalVelocity)
 		{
-			_controllerVelocity.x += horizontalVelocity;
+			_externalVelocity.x += horizontalVelocity;
 		}
 		public virtual void AddVerticalVelocity(float verticalVelocity)
 		{
@@ -142,8 +155,8 @@ namespace SF.Characters.Controllers
 		}
 		public virtual void SetVerticalVelocity(float verticalVelocity)
 		{
-			// Need to compare this to _rigidbody2D.velocityY to see which one feels better. 
-			_calculatedVelocity.y = verticalVelocity;
+            // Need to compare this to _rigidbody2D.velocityY to see which one feels better. 
+            _calculatedVelocity.y = verticalVelocity;
 		}
 		protected virtual void CalculateMovementState()
 		{
@@ -178,10 +191,12 @@ namespace SF.Characters.Controllers
 		{
 			Direction *= -1;
 		}
-		protected virtual void Reset()
+		public virtual void Reset()
 		{
-			_rigidbody2D = GetComponent<Rigidbody2D>();
-			_rigidbody2D.freezeRotation = true;
+			Debug.Log("Reset");
+			_calculatedVelocity = Vector3.zero;
+			_rigidbody2D.linearVelocity = Vector3.zero;
+			_externalVelocity = Vector3.zero;
 		}
 	}
 }

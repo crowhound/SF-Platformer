@@ -7,14 +7,10 @@ using SF.Utilities;
 
 namespace SF.Characters.Controllers
 {
-
-
 	[RequireComponent(typeof(BoxCollider2D))]
 	public class GroundedController2D : Controller2D
     {
-		[Header("Physics Properties")]
-		public MovementProperties DefaultPhysics = new(5);
-		public MovementProperties CurrentPhysics = new(0);
+		
 		/// <summary>
 		/// Reference speed if used for passing in a value in horizontal calculatin based on running or not.
 		/// </summary>
@@ -33,6 +29,11 @@ namespace SF.Characters.Controllers
 		public bool IsJumping = false;
 		public bool IsFalling = false;
 
+		[Header("Slope Settings")]
+		[SerializeField] private bool _useSlopes = false;
+		public float SlopeLimit = 35;
+		public float StandingOnSlopeAngle;
+		public bool OnSlope = false;
 
 		public Action OnGrounded;
 
@@ -46,8 +47,8 @@ namespace SF.Characters.Controllers
 		}
 		protected override void OnStart()
 		{
-			if(DefaultPhysics.GroundSpeed > DefaultPhysics.GroundMaxSpeed)
-				DefaultPhysics.GroundSpeed = DefaultPhysics.GroundMaxSpeed;
+			DefaultPhysics.GroundSpeed = Mathf.Clamp(DefaultPhysics.GroundSpeed, 0, DefaultPhysics.GroundMaxSpeed);
+
 			CurrentPhysics = DefaultPhysics;
 			ReferenceSpeed = CurrentPhysics.GroundSpeed;
 		}
@@ -70,15 +71,14 @@ namespace SF.Characters.Controllers
 				IsGrounded = false;
 				return;
 			}
+
 			IsGrounded = RaycastMultiple(Bounds.BottomLeft(), Bounds.BottomRight() ,Vector2.down, CollisionController.VerticalRayDistance, PlatformFilter, CollisionController.VerticalRayAmount);
-
-			
-
-			//StandingOnObject = (GroundedHit) ? GroundedHit.collider.gameObject : null;
 
 			// If grounded last frame, but grounded this frame call OnGrounded
 			if(!_wasGroundedLastFrame && IsGrounded)
 			{
+				if(_calculatedVelocity.y < 0)
+                    _calculatedVelocity.y = 0;
 				OnGrounded?.Invoke();
 			}
 		}
@@ -126,6 +126,8 @@ namespace SF.Characters.Controllers
 		}
 		protected override void CalculateHorizontal()
 		{
+			CalculateSlope();
+
 			if(Direction.x != 0)
 			{
 				// We only have to do a single clamp because than Direction.x takes care of it being negative or not when being multiplied.
@@ -139,63 +141,56 @@ namespace SF.Characters.Controllers
 				// Moving left
 				else if (Direction.x < 0 && CollisionInfo.IsCollidingLeft)
 					_calculatedVelocity.x = 0;
-			}
-			else if(_controllerVelocity.x == 0)
+            }
+			else
 			{
-				_calculatedVelocity.x = 0;
-				_rigidbody2D.velocityX = 0;
-			}	
+                _calculatedVelocity.x = Mathf.MoveTowards(_calculatedVelocity.x, 0, CurrentPhysics.GroundDeacceleration);
+            }
 		}
 		protected override void CalculateVertical()
 		{
 			if(!IsGrounded)
 			{
 				_calculatedVelocity.y += (-1 * CurrentPhysics.GravityScale);
-
-				if(_calculatedVelocity.y < 0)
-				{
-					_calculatedVelocity.y = (_calculatedVelocity.y < (-1 * CurrentPhysics.TerminalVelocity)
-						? -1 * CurrentPhysics.TerminalVelocity
-						: _calculatedVelocity.y);
-				}
-				else if(_calculatedVelocity.y > 0)
-				{
-					_calculatedVelocity.y = (_calculatedVelocity.y > (CurrentPhysics.MaxUpForce)
-						? CurrentPhysics.MaxUpForce
-						: _calculatedVelocity.y);
-				}
-			}
-			else // IsGrounded
-			{
-				_calculatedVelocity.y = IsJumping ? _calculatedVelocity.y : 0;
-				_rigidbody2D.velocityY = IsJumping ? _rigidbody2D.velocityY : 0;
 			}
 		}
-		public virtual void UpdatePhysics(MovementProperties movementProperties)
+
+		public virtual void CalculateSlope()
+		{
+			if(!_useSlopes)
+				return;
+
+			RaycastHit2D hit = Physics2D.Raycast(Bounds.BottomLeft(), Vector2.down,.25f);
+            StandingOnSlopeAngle = Vector2.Angle(hit.normal,Vector2.up);
+
+			OnSlope = StandingOnSlopeAngle > SlopeLimit;
+			
+			if(OnSlope)
+				IsGrounded = true;
+		}
+
+        public virtual void UpdatePhysics(MovementProperties movementProperties)
 		{
 			CurrentPhysics.GroundSpeed = movementProperties.GroundSpeed;
 			CurrentPhysics.GroundAcceleration = movementProperties.GroundAcceleration;
 			CurrentPhysics.GroundMaxSpeed = movementProperties.GroundMaxSpeed;
 			
 			CurrentPhysics.GravityScale = movementProperties.GravityScale;
-			CurrentPhysics.GravityAcceleration = movementProperties.GravityAcceleration;
 			CurrentPhysics.TerminalVelocity = movementProperties.TerminalVelocity;
 			CurrentPhysics.MaxUpForce = movementProperties.MaxUpForce;
 		}
 		protected override void CalculateMovementState()
 		{
-			if(IsJumping)
-			{
-				CharacterState.MovementState = (_calculatedVelocity.y > 0) 
-					? MovementState.Jumping 
-					: MovementState.Falling;
 
-				if (CharacterState.MovementState == MovementState.Falling)
-				{
-					IsFalling = true;
-					IsJumping = false;
-				}
-			}
+			if(_calculatedVelocity.y < 0)
+			{
+                IsFalling = true;
+                IsJumping = false;
+				CharacterState.MovementState = MovementState.Falling;
+            }
+
+			if(IsJumping)
+				CharacterState.MovementState = MovementState.Jumping;
 
 			if(IsGrounded)
 			{

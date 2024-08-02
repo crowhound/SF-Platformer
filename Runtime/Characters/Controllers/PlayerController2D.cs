@@ -15,7 +15,6 @@ namespace SF.Characters.Controllers
 #if UNITY_EDITOR
 		public void OnDrawGizmos()
 		{
-			if(!IsDebugModeActivated) return;
 
 			_boxCollider = (_boxCollider == null) ? GetComponent<BoxCollider2D>() : _boxCollider;
 			Bounds = _boxCollider.bounds;

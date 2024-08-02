@@ -1,6 +1,6 @@
 {
-    "name": "SF.Platformer.Editor",
-    "rootNamespace": "SF",
+    "name": "SFEditor.Platformer",
+    "rootNamespace": "SFEditor",
     "references": [
         "GUID:ec01ee253cf3f4f4180b7e31adb65317",
         "GUID:343deaaf83e0cee4ca978e7df0b80d21",

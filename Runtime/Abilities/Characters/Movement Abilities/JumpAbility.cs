@@ -1,31 +1,36 @@
 using SF.AbilityModule;
 using SF.InputModule;
 
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace SF.Abilities.CharacterModule
 {
     public class JumpAbility : AbilityCore, IInputAbility
     {
-        public JumpingPhysics JumpingPhysics;
+        [Header("Jumping Phjysics")]
+        public float JumpHeight = 12;
+        public int JumpAmount = 1;
+        public int JumpsRemaining;
+
         protected override void OnInitialize()
         {
             _controller2d.OnGrounded += ResetJumps;
         }
         private void OnInputJump(InputAction.CallbackContext context)
 		{
-			if (IsEnabled == false || JumpingPhysics.JumpsRemaining < 1) return;
+			if (IsEnabled == false || JumpsRemaining < 1) return;
 
-            JumpingPhysics.JumpsRemaining--;
+            JumpsRemaining--;
 
 			_controller2d.IsJumping = true;
             _controller2d.IsFalling = false;
-            _controller2d.SetVerticalVelocity(JumpingPhysics.JumpHeight);
+            _controller2d.SetVerticalVelocity(JumpHeight);
 		}
 
-		private void ResetJumps()
+        public void ResetJumps()
         {
-            JumpingPhysics.ResetJumps();
+            JumpsRemaining = JumpAmount;
         }
 
         private void OnEnable()

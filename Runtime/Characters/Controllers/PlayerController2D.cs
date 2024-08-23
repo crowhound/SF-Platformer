@@ -2,15 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
+#if SF_Utilities
 using SF.Utilities;
-
+#else
+using SF.Platformer.Utilities;
+#endif
 using UnityEngine;
 
 namespace SF.Characters.Controllers
 {
 	public class PlayerController : GroundedController2D
     {
-
 
 #if UNITY_EDITOR
 		public void OnDrawGizmos()

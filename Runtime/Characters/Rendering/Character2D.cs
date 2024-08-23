@@ -50,7 +50,11 @@ namespace SF.Characters
 		{
 			SetAnimations();
 		}
-		private void SetAnimations()
+        /// <summary>
+		/// The Movement State is calculated in the Physics Controller.
+        /// <see cref="GroundedController2D.CalculateMovementState"/>
+        /// </summary>
+        private void SetAnimations()
 		{
 			if(_isForcedCrossFading)
 			{

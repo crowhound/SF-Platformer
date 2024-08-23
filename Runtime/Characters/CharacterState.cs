@@ -12,7 +12,8 @@ namespace SF.Character.Core
 		Walking,
 		Running,
 		Jumping,
-		Falling
+		Falling, 
+		Gliding
 	}
 	public enum CharacterStatus
 	{

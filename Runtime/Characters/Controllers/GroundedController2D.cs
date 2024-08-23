@@ -3,7 +3,12 @@ using SF.Physics;
 using SF.Physics.Collision;
 using SF.Character.Core;
 using System;
+
+#if SF_Utilities
 using SF.Utilities;
+#else
+using SF.Platformer.Utilities;
+#endif
 
 namespace SF.Characters.Controllers
 {
@@ -28,6 +33,7 @@ namespace SF.Characters.Controllers
 		public bool IsSwimming = false;
 		public bool IsJumping = false;
 		public bool IsFalling = false;
+		public bool IsGliding = false;
 
 		[Header("Slope Settings")]
 		[SerializeField] private bool _useSlopes = false;
@@ -44,12 +50,15 @@ namespace SF.Characters.Controllers
 		{
 			_boxCollider = GetComponent<BoxCollider2D>();
 			Bounds = _boxCollider.bounds;
+			
 		}
 		protected override void OnStart()
 		{
 			DefaultPhysics.GroundSpeed = Mathf.Clamp(DefaultPhysics.GroundSpeed, 0, DefaultPhysics.GroundMaxSpeed);
+            
+			PlatformFilter.useLayerMask = true;
 
-			CurrentPhysics = DefaultPhysics;
+            CurrentPhysics = DefaultPhysics;
 			ReferenceSpeed = CurrentPhysics.GroundSpeed;
 		}
 		#region Collision Calculations
@@ -179,14 +188,27 @@ namespace SF.Characters.Controllers
 			CurrentPhysics.TerminalVelocity = movementProperties.TerminalVelocity;
 			CurrentPhysics.MaxUpForce = movementProperties.MaxUpForce;
 		}
+
+		/// <summary>
+		/// Calculates the current movement state that the player is currently in.
+		/// </summary>
+		/// <remarks>
+		/// This needs to be moved into the Controller2d parent class.
+		/// </remarks>
 		protected override void CalculateMovementState()
 		{
+			// TODO: There are some places that set the values outside of this function. Find a way to make it where this function is the only needed one. Example IsJump in the Jumping Ability.
 
+			// If our velocity is negative we are either falling/gliding.
 			if(_calculatedVelocity.y < 0)
 			{
+				if(IsGliding)
+                    CharacterState.MovementState = MovementState.Gliding;
+                else
+                    CharacterState.MovementState = MovementState.Falling;
+
                 IsFalling = true;
                 IsJumping = false;
-				CharacterState.MovementState = MovementState.Falling;
             }
 
 			if(IsJumping)

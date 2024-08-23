@@ -51,5 +51,17 @@ namespace SF.AbilityModule
 		{
 
 		}
+
+		/// <summary>
+		///		Override this to create custom ability checking to make sure the ability can actually be used.
+		/// </summary>
+		/// <returns></returns>
+		protected virtual bool CheckAbilityRequirements()
+		{
+			if(!_isInitialized || !IsEnabled) 
+				return false;
+
+			return true;
+		}
 	}
 }

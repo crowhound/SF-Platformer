@@ -9,11 +9,13 @@ namespace SF.Character.Core
 	public enum MovementState
 	{
 		Idle,
+		Crouching,
 		Walking,
 		Running,
 		Jumping,
 		Falling, 
-		Gliding
+		Gliding,
+
 	}
 	public enum CharacterStatus
 	{

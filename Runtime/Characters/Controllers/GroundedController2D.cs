@@ -34,6 +34,7 @@ namespace SF.Characters.Controllers
 		public bool IsJumping = false;
 		public bool IsFalling = false;
 		public bool IsGliding = false;
+		public bool IsCrouching = false;
 
 		[Header("Slope Settings")]
 		[SerializeField] private bool _useSlopes = false;
@@ -45,12 +46,15 @@ namespace SF.Characters.Controllers
 
 		#region Components 
 		protected BoxCollider2D _boxCollider;
+		protected Vector2 _originalColliderSize;
+		protected Vector2 _modifiedColliderSize;
+		protected Vector2 _previousColliderSize;
 		#endregion
 		protected override void OnAwake()
 		{
 			_boxCollider = GetComponent<BoxCollider2D>();
 			Bounds = _boxCollider.bounds;
-			
+			_originalColliderSize = _boxCollider.size;
 		}
 		protected override void OnStart()
 		{
@@ -83,7 +87,7 @@ namespace SF.Characters.Controllers
 
 			IsGrounded = RaycastMultiple(Bounds.BottomLeft(), Bounds.BottomRight() ,Vector2.down, CollisionController.VerticalRayDistance, PlatformFilter, CollisionController.VerticalRayAmount);
 
-			// If grounded last frame, but grounded this frame call OnGrounded
+			// If grounded last frame, but grounded this frame call GlideReset
 			if(!_wasGroundedLastFrame && IsGrounded)
 			{
 				if(_calculatedVelocity.y < 0)
@@ -95,7 +99,6 @@ namespace SF.Characters.Controllers
 		{
 			CollisionInfo.IsCollidingAbove = RaycastMultiple(Bounds.TopLeft(), Bounds.TopRight(), Vector2.up, CollisionController.VerticalRayDistance, PlatformFilter, CollisionController.VerticalRayAmount);
 		}
-
 		protected virtual void SideCollisionChecks()
 		{
 			// Right Side
@@ -161,6 +164,9 @@ namespace SF.Characters.Controllers
 			if(!IsGrounded)
 			{
 				_calculatedVelocity.y += (-1 * CurrentPhysics.GravityScale);
+				_calculatedVelocity.y = Mathf.Clamp(_calculatedVelocity.y,
+					-CurrentPhysics.TerminalVelocity,
+					CurrentPhysics.TerminalVelocity);
 			}
 		}
 
@@ -188,7 +194,6 @@ namespace SF.Characters.Controllers
 			CurrentPhysics.TerminalVelocity = movementProperties.TerminalVelocity;
 			CurrentPhysics.MaxUpForce = movementProperties.MaxUpForce;
 		}
-
 		/// <summary>
 		/// Calculates the current movement state that the player is currently in.
 		/// </summary>
@@ -203,10 +208,13 @@ namespace SF.Characters.Controllers
 			if(_calculatedVelocity.y < 0)
 			{
 				if(IsGliding)
-                    CharacterState.MovementState = MovementState.Gliding;
-                else
-                    CharacterState.MovementState = MovementState.Falling;
-
+					CharacterState.MovementState = MovementState.Gliding;
+				else
+				{
+					// Need to remove the crouch check when I get the collider calculation more accurate on resizing.
+					if(!IsCrouching)
+						CharacterState.MovementState = MovementState.Falling;
+				}
                 IsFalling = true;
                 IsJumping = false;
             }
@@ -216,8 +224,46 @@ namespace SF.Characters.Controllers
 
 			if(IsGrounded)
 			{
-				IsFalling = false;
+                IsFalling = false;
+
+                if(IsCrouching)
+				{
+					CharacterState.MovementState = MovementState.Crouching;
+					return;
+				}
+				
 				CharacterState.MovementState = (Direction.x == 0) ? MovementState.Idle : MovementState.Walking;
+			}
+		}
+
+		protected void LowerToGround()
+		{
+			
+			RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down);
+			transform.position = hit.point + new Vector2(0, CollisionController.VerticalRayDistance);
+		}
+
+		public virtual void ResizeCollider(Vector2 newSize)
+		{
+			// Need to keep track of the previous size if the collider was already resized once before, but wasn't reset to the default collider size.
+			_previousColliderSize = _boxCollider.size;
+			_modifiedColliderSize = newSize;
+            _boxCollider.size = newSize;
+
+            LowerToGround();
+		}
+
+        public void ResetColliderSize()
+		{
+			_boxCollider.size = _originalColliderSize;
+
+			//TODO: Do checks if colliding on the sides or ceiling to make sure the default collider size doesn't click through them.
+
+			// Put character above ground.
+			if(IsGrounded)
+			{
+				transform.position += new Vector3(0, CollisionController.VerticalRayDistance, 0);
+
 			}
 		}
 	}

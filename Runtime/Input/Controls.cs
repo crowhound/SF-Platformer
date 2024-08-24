@@ -61,7 +61,7 @@ namespace SF.InputModule
                     ""name"": ""Jump"",
                     ""type"": ""Button"",
                     ""id"": ""68fbfd09-edb9-4cd5-9257-74bf4155b6d9"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -90,8 +90,17 @@ namespace SF.InputModule
                     ""id"": ""697d0fbb-b2d5-4ed5-9709-4649d886cb58"",
                     ""expectedControlType"": """",
                     ""processors"": """",
-                    ""interactions"": ""Hold(duration=0.2)"",
+                    ""interactions"": ""Hold(duration=0.35)"",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Crouch"",
+                    ""type"": ""Button"",
+                    ""id"": ""a5cd7c8e-cfa7-4417-8951-9aeeaa76e693"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -306,6 +315,17 @@ namespace SF.InputModule
                 },
                 {
                     ""name"": """",
+                    ""id"": ""49d56c72-6227-42fd-a745-470a2f3fb18b"",
+                    ""path"": ""<HID::Bensussen Deutsch & Associates,Inc.(BDA) Core (Plus) Wired Controller>/button3"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Controller"",
+                    ""action"": ""Jump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""14c7c93c-29fc-4b79-8ef4-68eed3909d5e"",
                     ""path"": ""<Keyboard>/shift"",
                     ""interactions"": """",
@@ -345,6 +365,39 @@ namespace SF.InputModule
                     ""processors"": """",
                     ""groups"": "";Keyboard"",
                     ""action"": ""Glide"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""667c9d17-d33f-4d5f-82c4-bc0e0cb1cb84"",
+                    ""path"": ""<HID::Bensussen Deutsch & Associates,Inc.(BDA) Core (Plus) Wired Controller>/button3"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Controller"",
+                    ""action"": ""Glide"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""fdc69026-e508-4bbc-9209-d7c5aaabede0"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard"",
+                    ""action"": ""Crouch"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3015cf58-f2cd-4afb-ae5e-0cb29c9e70ae"",
+                    ""path"": ""<Keyboard>/downArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard"",
+                    ""action"": ""Crouch"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -911,6 +964,7 @@ namespace SF.InputModule
             m_Player_Running = m_Player.FindAction("Running", throwIfNotFound: true);
             m_Player_PowerUp = m_Player.FindAction("PowerUp", throwIfNotFound: true);
             m_Player_Glide = m_Player.FindAction("Glide", throwIfNotFound: true);
+            m_Player_Crouch = m_Player.FindAction("Crouch", throwIfNotFound: true);
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
             m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -997,6 +1051,7 @@ namespace SF.InputModule
         private readonly InputAction m_Player_Running;
         private readonly InputAction m_Player_PowerUp;
         private readonly InputAction m_Player_Glide;
+        private readonly InputAction m_Player_Crouch;
         public struct PlayerActions
         {
             private @Controls m_Wrapper;
@@ -1008,6 +1063,7 @@ namespace SF.InputModule
             public InputAction @Running => m_Wrapper.m_Player_Running;
             public InputAction @PowerUp => m_Wrapper.m_Player_PowerUp;
             public InputAction @Glide => m_Wrapper.m_Player_Glide;
+            public InputAction @Crouch => m_Wrapper.m_Player_Crouch;
             public InputActionMap Get() { return m_Wrapper.m_Player; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -1038,6 +1094,9 @@ namespace SF.InputModule
                 @Glide.started += instance.OnGlide;
                 @Glide.performed += instance.OnGlide;
                 @Glide.canceled += instance.OnGlide;
+                @Crouch.started += instance.OnCrouch;
+                @Crouch.performed += instance.OnCrouch;
+                @Crouch.canceled += instance.OnCrouch;
             }
 
             private void UnregisterCallbacks(IPlayerActions instance)
@@ -1063,6 +1122,9 @@ namespace SF.InputModule
                 @Glide.started -= instance.OnGlide;
                 @Glide.performed -= instance.OnGlide;
                 @Glide.canceled -= instance.OnGlide;
+                @Crouch.started -= instance.OnCrouch;
+                @Crouch.performed -= instance.OnCrouch;
+                @Crouch.canceled -= instance.OnCrouch;
             }
 
             public void RemoveCallbacks(IPlayerActions instance)
@@ -1234,6 +1296,7 @@ namespace SF.InputModule
             void OnRunning(InputAction.CallbackContext context);
             void OnPowerUp(InputAction.CallbackContext context);
             void OnGlide(InputAction.CallbackContext context);
+            void OnCrouch(InputAction.CallbackContext context);
         }
         public interface IUIActions
         {

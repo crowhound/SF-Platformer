@@ -36,7 +36,7 @@
                     "name": "Jump",
                     "type": "Button",
                     "id": "68fbfd09-edb9-4cd5-9257-74bf4155b6d9",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -65,8 +65,17 @@
                     "id": "697d0fbb-b2d5-4ed5-9709-4649d886cb58",
                     "expectedControlType": "",
                     "processors": "",
-                    "interactions": "Hold(duration=0.2)",
+                    "interactions": "Hold(duration=0.35)",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "Crouch",
+                    "type": "Button",
+                    "id": "a5cd7c8e-cfa7-4417-8951-9aeeaa76e693",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -281,6 +290,17 @@
                 },
                 {
                     "name": "",
+                    "id": "49d56c72-6227-42fd-a745-470a2f3fb18b",
+                    "path": "<HID::Bensussen Deutsch & Associates,Inc.(BDA) Core (Plus) Wired Controller>/button3",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Controller",
+                    "action": "Jump",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "14c7c93c-29fc-4b79-8ef4-68eed3909d5e",
                     "path": "<Keyboard>/shift",
                     "interactions": "",
@@ -320,6 +340,39 @@
                     "processors": "",
                     "groups": ";Keyboard",
                     "action": "Glide",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "667c9d17-d33f-4d5f-82c4-bc0e0cb1cb84",
+                    "path": "<HID::Bensussen Deutsch & Associates,Inc.(BDA) Core (Plus) Wired Controller>/button3",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Controller",
+                    "action": "Glide",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "fdc69026-e508-4bbc-9209-d7c5aaabede0",
+                    "path": "<Keyboard>/s",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard",
+                    "action": "Crouch",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3015cf58-f2cd-4afb-ae5e-0cb29c9e70ae",
+                    "path": "<Keyboard>/downArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard",
+                    "action": "Crouch",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

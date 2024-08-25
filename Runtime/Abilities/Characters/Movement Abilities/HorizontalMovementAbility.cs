@@ -2,10 +2,12 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using SF.AbilityModule;
 using SF.InputModule;
-namespace SF.Abilities.Characters
+
+namespace SF.Abilities.CharacterModule
 {
     public class HorizontalMovementAbility : AbilityCore, IInputAbility
     {
+		[SerializeField] private bool _isRunningToggleable = true;
         #region Input Actions
         private void OnInputMove(InputAction.CallbackContext context)
 		{
@@ -16,11 +18,24 @@ namespace SF.Abilities.Characters
 		}
         private void OnMoveInputRun(InputAction.CallbackContext context)
         {
-			_controller2d.IsRunning = context.ReadValue<float>() > 0;
+			if(_isRunningToggleable)
+				_controller2d.IsRunning = !_controller2d.IsRunning;
+			else
+                _controller2d.IsRunning = context.ReadValue<float>() > 0;
+                
 			_controller2d.ReferenceSpeed = _controller2d.IsRunning
-				? _controller2d.CurrentPhysics.GroundRunningSpeed
-				: _controller2d.CurrentPhysics.GroundSpeed;
+                    ? _controller2d.CurrentPhysics.GroundRunningSpeed
+                    : _controller2d.CurrentPhysics.GroundSpeed;
         }
+
+		private void OnMoveInputRunCancelled(InputAction.CallbackContext context)
+        {
+			if(_isRunningToggleable)
+				return;
+
+			_controller2d.IsRunning = false;
+			_controller2d.ReferenceSpeed = _controller2d.CurrentPhysics.GroundSpeed;
+		}
         #endregion Input Actions
         private void OnEnable()
 		{
@@ -29,7 +44,7 @@ namespace SF.Abilities.Characters
 			InputManager.Controls.Player.Move.canceled += OnInputMove;
 
             InputManager.Controls.Player.Running.performed += OnMoveInputRun;
-			InputManager.Controls.Player.Running.canceled += OnMoveInputRun;
+			InputManager.Controls.Player.Running.canceled += OnMoveInputRunCancelled;
 		}
 
         private void OnDisable()
@@ -40,7 +55,7 @@ namespace SF.Abilities.Characters
 			InputManager.Controls.Player.Move.canceled -= OnInputMove;
 
             InputManager.Controls.Player.Running.performed -= OnMoveInputRun;
-			InputManager.Controls.Player.Running.canceled -= OnMoveInputRun;
+			InputManager.Controls.Player.Running.canceled -= OnMoveInputRunCancelled;
 		}
 	}
 }

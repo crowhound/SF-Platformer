@@ -1,6 +1,8 @@
 using SF.Character.Core;
 using SF.Characters.Controllers;
 
+using Unity.Profiling;
+
 using UnityEngine;
 
 namespace SF.Characters
@@ -8,6 +10,9 @@ namespace SF.Characters
 	[RequireComponent(typeof(Animator), typeof(SpriteRenderer))]
     public class Character2D : MonoBehaviour
     {
+#if DEBUG
+		private static ProfilerMarker s_AnimationUpdateMarker = new(ProfilerCategory.Animation, "SF.Animation.Update" );
+#endif
 		public enum CharacterTypes { Player, Ally, Enemy, NPC}
 		public CharacterTypes CharacterType = CharacterTypes.Player;
 		public CharacterState CharacterState => _controller.CharacterState;
@@ -56,6 +61,9 @@ namespace SF.Characters
         /// </summary>
         private void SetAnimations()
 		{
+#if DEBUG
+            s_AnimationUpdateMarker.Begin();
+#endif
 			if(_isForcedCrossFading)
 			{
 				_animationFadeTime -= Time.deltaTime;
@@ -67,17 +75,20 @@ namespace SF.Characters
 			if(_forcedStateHash != 0 && _animator.HasState(0, _forcedStateHash))
 			{
 				_isForcedCrossFading = true;
-                _animator.CrossFade(_forcedStateHash, _animationFadeTime);
+                _animator.CrossFade(_forcedStateHash, _animationFadeTime,0);
 				_forcedStateHash = 0;
 			}
 			else if(_animator.HasState(0, AnimationHash))
 			{
-				_animator.CrossFade(AnimationHash, 0);
+				_animator.CrossFade(AnimationHash, 0,0);
 			}
-		}
+#if DEBUG
+            s_AnimationUpdateMarker.End();
+#endif
+        }
 
-		// The 0.3f is the default fade time for Unity's crossfade api.
-		public void SetAnimationState(string stateName, float animationFadeTime = 0.3f)
+        // The 0.3f is the default fade time for Unity's crossfade api.
+        public void SetAnimationState(string stateName, float animationFadeTime = 0.3f)
 		{
 			_forcedStateHash = Animator.StringToHash(stateName);
             _animationFadeTime = animationFadeTime;

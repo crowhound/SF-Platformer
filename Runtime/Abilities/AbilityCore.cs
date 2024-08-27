@@ -6,7 +6,7 @@ namespace SF.AbilityModule
 	/// <summary>
 	/// Abilities contain the data for what actions can do and how they do them.
 	/// </summary>
-    public class AbilityCore : MonoBehaviour, IAbility
+    public abstract class AbilityCore : MonoBehaviour, IAbility
     {
 		public bool IsEnabled = true;
 		public bool InitOnStart = true;
@@ -58,10 +58,7 @@ namespace SF.AbilityModule
 		/// <returns></returns>
 		protected virtual bool CheckAbilityRequirements()
 		{
-			if(!_isInitialized || !IsEnabled) 
-				return false;
-
-			return true;
+			return (!_isInitialized || !IsEnabled);
 		}
 	}
 }

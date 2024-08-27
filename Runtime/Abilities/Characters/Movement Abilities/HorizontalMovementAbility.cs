@@ -18,10 +18,9 @@ namespace SF.Abilities.CharacterModule
 		}
         private void OnMoveInputRun(InputAction.CallbackContext context)
         {
-			if(_isRunningToggleable)
-				_controller2d.IsRunning = !_controller2d.IsRunning;
-			else
-                _controller2d.IsRunning = context.ReadValue<float>() > 0;
+			_controller2d.IsRunning = (_isRunningToggleable)
+				? !_controller2d.IsRunning
+				: context.ReadValue<float>() > 0;
                 
 			_controller2d.ReferenceSpeed = _controller2d.IsRunning
                     ? _controller2d.CurrentPhysics.GroundRunningSpeed

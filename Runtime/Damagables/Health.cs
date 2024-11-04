@@ -4,6 +4,7 @@ using SF.Events;
 using SF.SpawnModule;
 using SF.Characters.Controllers;
 using SF.Characters;
+using SF.Character.Core;
 
 namespace SF
 {
@@ -20,6 +21,10 @@ namespace SF
         [Tooltip("If you want to force an animation state when this object is damaged than set this string to the name of the animation state.")]
         public const string HitAnimationName = "Damaged";
         public readonly int HitAnimationHash = Animator.StringToHash(HitAnimationName);
+
+        public const string DeathAnimationName = "Death";
+        public readonly int DeathAnimationHash = Animator.StringToHash(DeathAnimationName);
+
         public float HitAnimationDuration = 0.3f;
 
         private Controller2D _controller;
@@ -29,6 +34,7 @@ namespace SF
         {
             _controller = GetComponent<Controller2D>();
             _character2D = GetComponent<Character2D>();
+
         }
         public virtual void TakeDamage(int damage)
         {
@@ -54,8 +60,10 @@ namespace SF
 
         protected virtual void Kill()
         {
-            // This is more for things inheriting from Health.
-            // Might have something in here later.
+            _controller.CharacterState.CharacterStatus = CharacterStatus.Dead;
+
+            if(_character2D != null && !string.IsNullOrEmpty(DeathAnimationName))
+                _character2D.SetAnimationState(DeathAnimationName);
         }
 
 		public void OnEvent(RespawnEvent respawnEvent)

@@ -14,8 +14,8 @@ namespace SF.Characters.Controllers
 	public class Controller2D : MonoBehaviour, IForceReciever
 	{
         [Header("Physics Properties")]
-        public MovementProperties DefaultPhysics = new(5);
-        public MovementProperties CurrentPhysics = new(0);
+        public MovementProperties DefaultPhysics = new(new Vector2(5,5));
+        public MovementProperties CurrentPhysics = new(new Vector2(5, 5));
 
         [Header("States")]
 		public CharacterState CharacterState;
@@ -29,7 +29,7 @@ namespace SF.Characters.Controllers
 				OnDirectionChanged?.Invoke(this, _direction);
 			}
 		}
-		private Vector2 _direction;
+        [SerializeField] private Vector2 _direction;
 		public EventHandler<Vector2> OnDirectionChanged;
 		
 		#region Components 
@@ -106,6 +106,12 @@ namespace SF.Characters.Controllers
 		private void LateUpdate()
 		{
 			CalculateMovementState();
+			OnLateUpdate();
+		}
+
+		protected virtual void OnLateUpdate()
+		{
+
 		}
 		protected virtual void OnPreFixedUpdate()
 		{
@@ -114,7 +120,11 @@ namespace SF.Characters.Controllers
 		#region Movement Calculations
 		protected virtual void Move()
 		{
-			if(_externalVelocity != Vector2.zero)
+
+            if(CharacterState.CharacterStatus == CharacterStatus.Dead)
+                _calculatedVelocity = Vector2.zero;
+
+            if(_externalVelocity != Vector2.zero)
 			{
 				_calculatedVelocity = _externalVelocity;
 				_externalVelocity = Vector2.zero;
@@ -193,7 +203,9 @@ namespace SF.Characters.Controllers
 		}
 		public virtual void Reset()
 		{
-			Debug.Log("Reset");
+			if(_rigidbody2D == null)
+				_rigidbody2D = GetComponent<Rigidbody2D>();
+
 			_calculatedVelocity = Vector3.zero;
 			_rigidbody2D.linearVelocity = Vector3.zero;
 			_externalVelocity = Vector3.zero;

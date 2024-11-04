@@ -3,6 +3,10 @@ using SF.Physics;
 using SF.Physics.Collision;
 using SF.Character.Core;
 using System;
+using System.Runtime.InteropServices;
+using System.Collections.Generic;
+
+
 
 #if SF_Utilities
 using SF.Utilities;
@@ -14,8 +18,8 @@ namespace SF.Characters.Controllers
 {
 	[RequireComponent(typeof(BoxCollider2D))]
 	public class GroundedController2D : Controller2D
-    {
-		
+	{
+
 		/// <summary>
 		/// Reference speed if used for passing in a value in horizontal calculatin based on running or not.
 		/// </summary>
@@ -23,7 +27,8 @@ namespace SF.Characters.Controllers
 
 		[Header("Platform Settings")]
 		public ContactFilter2D PlatformFilter;
-		public GameObject StandingOnObject;
+        [SerializeField] protected ContactFilter2D OneWayPlatformFilter;
+        [SerializeField] public GameObject StandingOnObject { get; protected set; }
 
 
 		[Header("Booleans")]
@@ -36,14 +41,40 @@ namespace SF.Characters.Controllers
 		public bool IsGliding = false;
 		public bool IsCrouching = false;
 
+
+		public bool IsClimbing
+		{
+			get { return _isClimbing; }
+			set 
+			{ 
+				_isClimbing = value; 
+
+				if(!_isClimbing)
+				{
+					CurrentPhysics.GravityScale = DefaultPhysics.GravityScale;
+                    _character.CanTurnAround = true;
+                }
+				else
+				{
+					CurrentPhysics.GravityScale = 0;
+					_character.CanTurnAround = false;
+				}
+			}
+		}
+		[SerializeField] private bool _isClimbing = false;
 		[Header("Slope Settings")]
 		[SerializeField] private bool _useSlopes = false;
-		public float SlopeLimit = 35;
+		public float SlopeLimit = 55;
+		public float SlopeSlipLimit = 35;
+		[SerializeField] protected Vector2 _slopeNormal;
 		public float StandingOnSlopeAngle;
 		public bool OnSlope = false;
+		protected Vector2 _slopeSideDirection;
 
+		protected int OneWayFilterBitMask => PlatformFilter.layerMask & OneWayPlatformFilter.layerMask;
 		public Action OnGrounded;
 
+		protected Character2D _character;
 		#region Components 
 		protected BoxCollider2D _boxCollider;
 		protected Vector2 _originalColliderSize;
@@ -52,17 +83,19 @@ namespace SF.Characters.Controllers
 		#endregion
 		protected override void OnAwake()
 		{
+			_character = GetComponent<Character2D>();
 			_boxCollider = GetComponent<BoxCollider2D>();
 			Bounds = _boxCollider.bounds;
 			_originalColliderSize = _boxCollider.size;
 		}
 		protected override void OnStart()
 		{
+			CharacterState.StatusEffectChanged += OnStatusEffectChanged;
 			DefaultPhysics.GroundSpeed = Mathf.Clamp(DefaultPhysics.GroundSpeed, 0, DefaultPhysics.GroundMaxSpeed);
-            
+
 			PlatformFilter.useLayerMask = true;
 
-            CurrentPhysics = DefaultPhysics;
+			CurrentPhysics = DefaultPhysics;
 			ReferenceSpeed = CurrentPhysics.GroundSpeed;
 		}
 		#region Collision Calculations
@@ -85,13 +118,16 @@ namespace SF.Characters.Controllers
 				return;
 			}
 
-			IsGrounded = RaycastMultiple(Bounds.BottomLeft(), Bounds.BottomRight() ,Vector2.down, CollisionController.VerticalRayDistance, PlatformFilter, CollisionController.VerticalRayAmount);
+			IsGrounded = RaycastMultiple(Bounds.BottomLeft() + new Vector2(CollisionController.RayOffset,0), Bounds.BottomRight() - new Vector2(CollisionController.RayOffset, 0), Vector2.down, CollisionController.VerticalRayDistance, PlatformFilter, CollisionController.VerticalRayAmount);
 
-			// If grounded last frame, but grounded this frame call GlideReset
+
+			if(IsGrounded)
+				_calculatedVelocity.y = 0;
+			// If grounded last frame, but grounded this frame call OnGrounded
 			if(!_wasGroundedLastFrame && IsGrounded)
 			{
 				if(_calculatedVelocity.y < 0)
-                    _calculatedVelocity.y = 0;
+					_calculatedVelocity.y = 0;
 				OnGrounded?.Invoke();
 			}
 		}
@@ -100,17 +136,29 @@ namespace SF.Characters.Controllers
 			CollisionInfo.IsCollidingAbove = RaycastMultiple(Bounds.TopLeft(), Bounds.TopRight(), Vector2.up, CollisionController.VerticalRayDistance, PlatformFilter, CollisionController.VerticalRayAmount);
 		}
 		protected virtual void SideCollisionChecks()
-		{
+		{ 
 			// Right Side
-			CollisionInfo.IsCollidingRight = RaycastMultiple(Bounds.TopRight(), Bounds.BottomRight(), Vector2.right, CollisionController.HoriztonalRayDistance, PlatformFilter, CollisionController.HoriztonalRayAmount);
+			CollisionInfo.IsCollidingRight = RaycastMultiple(Bounds.TopRight(), Bounds.MiddleRight(), Vector2.right, CollisionController.HoriztonalRayDistance, PlatformFilter, CollisionController.HoriztonalRayAmount);
 
 			// Left Side
-			CollisionInfo.IsCollidingLeft = RaycastMultiple(Bounds.TopLeft(), Bounds.BottomLeft(), Vector2.left, CollisionController.HoriztonalRayDistance, PlatformFilter, CollisionController.HoriztonalRayAmount);
+			CollisionInfo.IsCollidingLeft = RaycastMultiple(Bounds.TopLeft(), Bounds.MiddleLeft(), Vector2.left, CollisionController.HoriztonalRayDistance, PlatformFilter, CollisionController.HoriztonalRayAmount);
+
+			RaycastHit2D hit2D;
+
+            if(Direction.x > 0) // Looking Right
+				hit2D = Physics2D.BoxCast(Bounds.MiddleRight(), _boxCollider.size, 0, Vector2.right, CollisionController.HoriztonalRayDistance, PlatformFilter.layerMask);
+			else
+                hit2D = Physics2D.BoxCast(Bounds.MiddleLeft(), new Vector2(CollisionController.HoriztonalRayDistance, _boxCollider.size.y), 0, Vector2.left, CollisionController.HoriztonalRayDistance, PlatformFilter.layerMask);
+
+			if(!hit2D)
+                CollisionInfo.ClimbableSurfaceHit = new RaycastHit2D();
+            else if(hit2D.collider.TryGetComponent(out ClimbableSurface climbableSurface))
+				CollisionInfo.ClimbableSurfaceHit = hit2D;
 		}
 
 		public bool RaycastMultiple(Vector2 origin, Vector2 end, Vector2 direction, float distance, LayerMask layerMask, int numberOfRays = 4)
 		{
-			bool hasHit = false;
+			RaycastHit2D hasHit;
 			Vector2 startPosition;
 			float stepPercent;
 
@@ -118,12 +166,25 @@ namespace SF.Characters.Controllers
 			{
 				stepPercent = (float)x / (float)(numberOfRays - 1);
 				startPosition = Vector2.Lerp(origin, end, stepPercent);
-				hasHit =  Physics2D.Raycast(startPosition, direction, distance, layerMask);
+				hasHit = Physics2D.Raycast(startPosition, direction, distance, layerMask);
 
-				if(hasHit)
-					return true;
-			}
-			return hasHit;
+                if(hasHit)
+				{
+
+                    if(direction.x > 0)
+                        CollisionInfo.RightHit = hasHit;
+                    else
+                        CollisionInfo.LeftHit = hasHit;
+
+                    if(direction.y > 0)
+                        CollisionInfo.CeilingHit = hasHit;
+                    else
+                        CollisionInfo.GroundedHit = hasHit;
+
+                    return true;
+				}
+            }
+            return false;
 		}
 
 		public bool RaycastMultiple(Vector2 origin, Vector2 end, Vector2 direction, float distance, ContactFilter2D contactFilter2D, int numberOfRays = 4)
@@ -136,37 +197,53 @@ namespace SF.Characters.Controllers
 		{
 			Bounds = _boxCollider.bounds;
 		}
-		protected override void CalculateHorizontal()
+        protected void OnStatusEffectChanged(StatusEffect statusEffect)
+        {
+			if(statusEffect == StatusEffect.Beserk)
+				GetComponent<SpriteRenderer>().color = Color.red;
+        }
+        protected override void CalculateHorizontal()
 		{
-			CalculateSlope();
+			if(IsClimbing)
+			{
+                _calculatedVelocity.x = 0;
+                return;
+			}
 
 			if(Direction.x != 0)
 			{
 				// We only have to do a single clamp because than Direction.x takes care of it being negative or not when being multiplied.
-				ReferenceSpeed = Mathf.Clamp(ReferenceSpeed,0,CurrentPhysics.GroundMaxSpeed);
+				ReferenceSpeed = Mathf.Clamp(ReferenceSpeed, 0, CurrentPhysics.GroundMaxSpeed);
 
-				_calculatedVelocity.x = ReferenceSpeed * Direction.x;
+				// TODO: When turning around erase previously directional velocity.
+				// If it is kept the player could slide in the previous direction for a second before running the new direction on smaller ground acceleration values.
+				_calculatedVelocity.x = Mathf.MoveTowards(_calculatedVelocity.x, ReferenceSpeed * Direction.x, CurrentPhysics.GroundAcceleration);
 
 				// Moving right
-				if (Direction.x > 0 && CollisionInfo.IsCollidingRight)
+				if(Direction.x > 0 && CollisionInfo.IsCollidingRight)
 					_calculatedVelocity.x = 0;
 				// Moving left
-				else if (Direction.x < 0 && CollisionInfo.IsCollidingLeft)
+				else if(Direction.x < 0 && CollisionInfo.IsCollidingLeft)
 					_calculatedVelocity.x = 0;
-            }
+			}
 			else
 			{
-                _calculatedVelocity.x = Mathf.MoveTowards(_calculatedVelocity.x, 0, CurrentPhysics.GroundDeacceleration);
-            }
+				_calculatedVelocity.x = Mathf.MoveTowards(_calculatedVelocity.x, 0, CurrentPhysics.GroundDeacceleration);
+			}
 		}
 		protected override void CalculateVertical()
 		{
-			if(!IsGrounded)
+			if(IsClimbing)
+			{
+				_calculatedVelocity.y = Direction.y * CurrentPhysics.ClimbSpeed.y;
+			}
+
+			if(!IsGrounded && !IsClimbing)
 			{
 				_calculatedVelocity.y += (-1 * CurrentPhysics.GravityScale);
 				_calculatedVelocity.y = Mathf.Clamp(_calculatedVelocity.y,
 					-CurrentPhysics.TerminalVelocity,
-					CurrentPhysics.TerminalVelocity);
+					CurrentPhysics.MaxUpForce);
 			}
 		}
 
@@ -175,21 +252,36 @@ namespace SF.Characters.Controllers
 			if(!_useSlopes)
 				return;
 
-			RaycastHit2D hit = Physics2D.Raycast(Bounds.BottomLeft(), Vector2.down,.25f);
-            StandingOnSlopeAngle = Vector2.Angle(hit.normal,Vector2.up);
+			if(Direction.x > 0)
+				_slopeNormal = Physics2D.Raycast(Bounds.BottomRight(), Vector2.down, .25f).normal;
+			else
+				_slopeNormal = Physics2D.Raycast(Bounds.BottomLeft(), Vector2.down, .25f).normal;
 
-			OnSlope = StandingOnSlopeAngle > SlopeLimit;
-			
+			StandingOnSlopeAngle = Vector2.Angle(_slopeNormal, Vector2.up);
+
+			OnSlope = StandingOnSlopeAngle > 5;
+
 			if(OnSlope)
+			{
 				IsGrounded = true;
+				// TODO: Make the ability to walk up slopes.
+				_calculatedVelocity = Vector3.ProjectOnPlane(_calculatedVelocity, _slopeNormal);
+			}
 		}
 
-        public virtual void UpdatePhysics(MovementProperties movementProperties)
+		protected override void Move()
+		{
+			CalculateSlope();
+
+
+			base.Move();
+		}
+		public virtual void UpdatePhysics(MovementProperties movementProperties)
 		{
 			CurrentPhysics.GroundSpeed = movementProperties.GroundSpeed;
 			CurrentPhysics.GroundAcceleration = movementProperties.GroundAcceleration;
 			CurrentPhysics.GroundMaxSpeed = movementProperties.GroundMaxSpeed;
-			
+
 			CurrentPhysics.GravityScale = movementProperties.GravityScale;
 			CurrentPhysics.TerminalVelocity = movementProperties.TerminalVelocity;
 			CurrentPhysics.MaxUpForce = movementProperties.MaxUpForce;
@@ -202,10 +294,22 @@ namespace SF.Characters.Controllers
 		/// </remarks>
 		protected override void CalculateMovementState()
 		{
+
+			if(CharacterState.CharacterStatus == CharacterStatus.Dead )
+				return;
+
 			// TODO: There are some places that set the values outside of this function. Find a way to make it where this function is the only needed one. Example IsJump in the Jumping Ability.
 
+			if(IsClimbing)
+			{
+				if(_calculatedVelocity.y != 0)
+					CharacterState.MovementState = MovementState.Climbing;
+				else
+					CharacterState.MovementState = MovementState.ClimbingIdle;
+			}
+
 			// If our velocity is negative we are either falling/gliding.
-			if(_calculatedVelocity.y < 0)
+			if(_calculatedVelocity.y < 0 && !IsClimbing)
 			{
 				if(IsGliding)
 					CharacterState.MovementState = MovementState.Gliding;
@@ -238,7 +342,6 @@ namespace SF.Characters.Controllers
 
 		protected void LowerToGround()
 		{
-			
 			RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down);
 			transform.position = hit.point + new Vector2(0, CollisionController.VerticalRayDistance);
 		}
@@ -266,5 +369,54 @@ namespace SF.Characters.Controllers
 
 			}
 		}
-	}
+
+#if UNITY_EDITOR
+
+        private readonly List<Vector3> _listOfPoints = new();
+
+        public void OnDrawGizmos()
+        {
+            _listOfPoints.Clear();
+            _boxCollider = (_boxCollider == null) ? GetComponent<BoxCollider2D>() : _boxCollider;
+            Bounds = _boxCollider.bounds;
+
+            Vector2 startPosition;
+            float stepPercent;
+            int numberOfRays = CollisionController.VerticalRayAmount;
+            Vector2 origin = Bounds.BottomLeft();
+            Vector2 end = Bounds.BottomRight();
+
+            for(int x = 0; x < numberOfRays; x++) // Down
+            {
+                stepPercent = (float)x / (float)(numberOfRays - 1);
+                startPosition = Vector2.Lerp(origin, end, stepPercent);
+                if(x == 0)
+                    startPosition += new Vector2(CollisionController.RayOffset, 0);
+                if(x == numberOfRays - 1)
+                    startPosition -= new Vector2(CollisionController.RayOffset, 0);
+                _listOfPoints.Add(startPosition);
+                _listOfPoints.Add(startPosition - new Vector2(0, CollisionController.VerticalRayDistance));
+            }
+
+            numberOfRays = CollisionController.HoriztonalRayAmount;
+            origin = Bounds.TopRight();
+            end = Bounds.BottomRight();
+
+            for(int x = 0; x < numberOfRays; x++) // Right
+            {
+                stepPercent = (float)x / (float)(numberOfRays - 1);
+                startPosition = Vector2.Lerp(origin, end, stepPercent);
+                _listOfPoints.Add(startPosition);
+                _listOfPoints.Add(startPosition + new Vector2(CollisionController.HoriztonalRayDistance, 0));
+            }
+
+            ReadOnlySpan<Vector3> pointsAsSpan = CollectionsMarshal.AsSpan(_listOfPoints);
+            Gizmos.DrawLineList(pointsAsSpan);
+
+            if(CollisionInfo.ClimbableSurfaceHit)
+                Gizmos.DrawWireSphere(CollisionInfo.ClimbableSurfaceHit.point, .25f);
+
+        }
+#endif
+    }
 }

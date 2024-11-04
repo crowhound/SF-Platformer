@@ -17,6 +17,7 @@ namespace SF.Characters
 		public CharacterTypes CharacterType = CharacterTypes.Player;
 		public CharacterState CharacterState => _controller.CharacterState;
 
+		public bool CanTurnAround = true;
 		public bool StartedFacingRight = true;
 		#region Common Components
 		private SpriteRenderer _spriteRend;
@@ -78,7 +79,8 @@ namespace SF.Characters
                 _animator.CrossFade(_forcedStateHash, _animationFadeTime,0);
 				_forcedStateHash = 0;
 			}
-			else if(_animator.HasState(0, AnimationHash))
+			else if(_animator.HasState(0, AnimationHash) 
+					&& _controller.CharacterState.CharacterStatus != CharacterStatus.Dead)
 			{
 				_animator.CrossFade(AnimationHash, 0,0);
 			}
@@ -95,7 +97,10 @@ namespace SF.Characters
         }
 		private void SpriteFlip(Vector2 direction)
 		{
-			_spriteRend.flipX = StartedFacingRight
+			if(!CanTurnAround)
+				return;
+
+            _spriteRend.flipX = StartedFacingRight
 				? (!(direction.x > 0))
 				: (!(direction.x < 0));
         }

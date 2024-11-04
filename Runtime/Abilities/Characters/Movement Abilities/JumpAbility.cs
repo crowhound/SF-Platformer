@@ -15,6 +15,8 @@ namespace SF.Abilities.CharacterModule
         public int JumpAmount = 1;
         public int JumpsRemaining;
 
+        public bool CanJumpInfinitely = false;
+
         protected override void OnInitialize()
         {
             _controller2d.OnGrounded += ResetJumps;
@@ -30,7 +32,8 @@ namespace SF.Abilities.CharacterModule
             if(_controller2d.IsGliding)
                 return false;
 
-            if(JumpsRemaining < 1)
+
+            if(JumpsRemaining < 1 && !CanJumpInfinitely)
                 return false;
 
             return true;
@@ -48,6 +51,7 @@ namespace SF.Abilities.CharacterModule
 
 			_controller2d.IsJumping = true;
             _controller2d.IsFalling = false;
+            _controller2d.IsClimbing = false;
 
             // TODO: Only add the running heigh bonus to the first jump.
             _controller2d.SetVerticalVelocity(CalculatedJumpHeight);

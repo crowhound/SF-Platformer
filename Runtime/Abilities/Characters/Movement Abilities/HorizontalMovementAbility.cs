@@ -14,7 +14,7 @@ namespace SF.Abilities.CharacterModule
 			Vector2 input = context.ReadValue<Vector2>();
 
 			float xDirection = input.x != 0 ? input.x : 0;
-			_controller2d.Direction = new Vector2(xDirection,0);
+			_controller2d.Direction = new Vector2(xDirection, _controller2d.Direction.y);
 		}
         private void OnMoveInputRun(InputAction.CallbackContext context)
         {

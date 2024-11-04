@@ -34,7 +34,7 @@ namespace SF.AbilityModule
             for (int i = 0; i < Abilities.Count; i++)
             {
                 // If the Ability is not controlled by some form of input it runs on update.
-                if(Abilities[i] is not IInputAbility)
+                if(Abilities[i].DoOnUpdate)
                     Abilities[i].UpdateAbility();
             }
         }

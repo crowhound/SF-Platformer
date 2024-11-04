@@ -1,3 +1,4 @@
+using SF.Character.Core;
 using SF.Characters.Controllers;
 using UnityEngine;
 
@@ -8,10 +9,19 @@ namespace SF.AbilityModule
 	/// </summary>
     public abstract class AbilityCore : MonoBehaviour, IAbility
     {
+		public MovementState BlockingMovementStates;
+		public CharacterStatus BlockingCharacterStatus;
+
 		public bool IsEnabled = true;
 		public bool InitOnStart = true;
+		public bool DoOnUpdate = false;
 		[SerializeField] protected bool _isInitialized = false;
+		
+
+
 		protected GroundedController2D _controller2d;
+
+
 		public virtual void Initialize(Controller2D controller2D = null)
 		{
 			if (_isInitialized)
@@ -52,13 +62,35 @@ namespace SF.AbilityModule
 
 		}
 
+		protected virtual void OnAbilityInteruption()
+		{
+
+		}
+
+		/// <summary>
+		/// Is there any state for the controller, character or ability that blocks the start of the ability.
+		/// </summary>
+		/// <returns></returns>
+		protected bool CanStartAbility()
+		{
+            if(!_isInitialized || !IsEnabled || _controller2d == null)
+                return false;
+
+            // If we are in a blocking movement state or blocking movement status don't start ability.
+            if((_controller2d.CharacterState.MovementState & BlockingMovementStates) > 0
+                || (_controller2d.CharacterState.CharacterStatus & BlockingCharacterStatus) > 0)
+                return false;
+
+			return CheckAbilityRequirements();
+        }
+
 		/// <summary>
 		///		Override this to create custom ability checking to make sure the ability can actually be used.
 		/// </summary>
 		/// <returns></returns>
 		protected virtual bool CheckAbilityRequirements()
 		{
-			return (!_isInitialized || !IsEnabled);
+			return true;
 		}
 	}
 }

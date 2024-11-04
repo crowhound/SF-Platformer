@@ -8,6 +8,7 @@ namespace SF
 	{
 		public string CheckpointName;
 		public LayerMask PlayerMask;
+
 		private void OnTriggerEnter2D(Collider2D collision)
 		{
 			ActivateCheckPoint();

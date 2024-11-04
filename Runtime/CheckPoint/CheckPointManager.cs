@@ -9,7 +9,12 @@ namespace SF.SpawnModule
         public CheckPoint StartingCheckPoint;
         public CheckPoint CurrentCheckPoint;
 
-		public void OnEvent(CheckPointEvent checkPointEvent)
+        private void Start()
+        {
+			if(StartingCheckPoint != null && CurrentCheckPoint == null)
+				CurrentCheckPoint = StartingCheckPoint;
+        }
+        public void OnEvent(CheckPointEvent checkPointEvent)
 		{
 			switch (checkPointEvent.EventType) 
 			{

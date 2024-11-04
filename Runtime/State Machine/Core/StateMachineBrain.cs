@@ -34,6 +34,9 @@ namespace SF.StateMachine.Core
 
 		private void Start()
         {
+            if(CurrentState == null)
+                CurrentState = _states.First();
+
             // Don't do first Enter State in awake or you might call it before the _states init.
             if(CurrentState != null)
 				CurrentState.EnterState();

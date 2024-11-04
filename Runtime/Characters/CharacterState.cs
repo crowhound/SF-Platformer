@@ -1,3 +1,5 @@
+using System;
+
 namespace SF.Character.Core
 {
 	public enum CharacterType
@@ -6,8 +8,10 @@ namespace SF.Character.Core
 		Enemy,
 		AI
 	}
+	[System.Flags]
 	public enum MovementState
 	{
+		None,
 		Idle,
 		Crouching,
 		Walking,
@@ -15,7 +19,8 @@ namespace SF.Character.Core
 		Jumping,
 		Falling, 
 		Gliding,
-
+		Climbing,
+		ClimbingIdle,
 	}
 	public enum CharacterStatus
 	{
@@ -23,10 +28,30 @@ namespace SF.Character.Core
 		Dead
 	}
 
-	[System.Serializable]
+    public enum StatusEffect
+    {
+        Normal,
+        Beserk
+    }
+
+    [System.Serializable]
 	public class CharacterState
 	{
 		public MovementState MovementState;
 		public CharacterStatus CharacterStatus;
+
+		[UnityEngine.SerializeField] private StatusEffect _statusEffect;
+		public StatusEffect StatusEffect
+		{
+			get	{ return _statusEffect;	}
+			set
+			{
+				if(value != _statusEffect)
+					StatusEffectChanged?.Invoke(value);
+				_statusEffect = value;
+			}
+		}
+
+		public Action<StatusEffect> StatusEffectChanged;
 	}
 }

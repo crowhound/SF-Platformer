@@ -1,3 +1,6 @@
+
+using UnityEngine;
+
 namespace SF.Physics
 {
     [System.Serializable]
@@ -13,7 +16,10 @@ namespace SF.Physics
         public float TerminalVelocity;
         public float MaxUpForce;
 
+        public Vector2 ClimbSpeed;
+
         public MovementProperties(
+            Vector2 _climbSpeed,
             float _groundSpeed = 5f,
             float _groundRunningSpeed = 7.5f,
             float _groundAcceleration = 1f,
@@ -32,6 +38,8 @@ namespace SF.Physics
             GravityScale = _gravityScale;
             TerminalVelocity = _terminalVelocity;
             MaxUpForce = _maxUpForce;
+
+            ClimbSpeed = _climbSpeed;
         }
     }
 }

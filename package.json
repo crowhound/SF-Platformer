@@ -1,16 +1,16 @@
 {
   "name": "shatter-fantasy.platformer",
-  "version": "0.1.0",
-  "unity": "2023.1",
+  "version": "0.0.1",
+  "unity": "2023.2",
   "displayName": "SF Platformer",
-  "description": "The SF Platformer package provides a template that can be customized and extended for making Platforming games.",
+  "description": "The SF Platformer package provides a template that can be customized and extended for making Platformer and Metroidvania like games.",
   "keywords": [
     "template"
   ],
   "category": "2d",
   "author": {
-    "name": "Jonathan Westfall",
-    "url": "https://github.com/Shatter-Fantasy"
+    "name": "Jonathan Westfall - Shatter Fantasy",
+    "url": "https://github.com/crowhound"
   },
   "dependencies": {
     "com.unity.inputsystem": "1.8.0"
@@ -19,6 +19,5 @@
   "_upm": {
     "changelog": ""
   },
-  "documentationUrl": "https://app.gitbook.com/o/SfDkagNWRll9OwbDmZcY/s/SyfnIH52ABETxxu5ldf4/unity-packages/platformer-package",
   "hideInEditor": false
 }

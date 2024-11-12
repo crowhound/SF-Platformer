@@ -70,3 +70,12 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# Make sure no sandbox files get pushed.
+*/[Ss]andbox/
+
+# Ignore any DocFX auto generated files.
+# DocFX Auto generated obj cache.
+/[Dd]ocumentation/obj/* 
+# DocFX Auto generated API YAML files.
+/[Dd]ocumentation/api/*

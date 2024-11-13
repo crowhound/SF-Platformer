@@ -1,12 +1,8 @@
 using UnityEngine;
+using SF.Physics;
 
-namespace SF
+namespace SF.DamageableModule
 {
-	public enum CollisionEventTypes 
-	{ 
-		OnTriggerEnter2D,
-		OnTriggerExit2D,
-	}
 
 	public class ZoneKill : MonoBehaviour
     {

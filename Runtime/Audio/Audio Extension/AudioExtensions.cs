@@ -1,15 +1,26 @@
 using UnityEngine;
 
-namespace SF
+namespace SF.AudioModule
 {
+    /// <summary>
+    /// A set of extension and helper methods for audio related stuff like converting float volumes to their decibal values that can be used in Unity's AudioMixers.
+    /// </summary>
     public static class AudioExtensions
     {
-        public static float VolumeToDecibal(this float volume)
+        /// <summary>
+        /// Converts a volume amplitude in float to decibal for loudness
+        /// </summary>
+        /// <param name="volumeAmplitude"></param>
+        /// <returns>The a decibal as a float.</returns>
+        public static float VolumeToDecibal(this float volumeAmplitude)
         {
-            if (volume > 1)
-                volume = 1;
+            if (volumeAmplitude > 1)
+                volumeAmplitude = 1;
 
-            return Mathf.Log10(volume) * 20;
+            // Decibal = 20 * log10(amplitude aka float volume).
+            return Mathf.Log10(volumeAmplitude) * 20;
         }
+
+        // TODO: Write the DecibalToVolume extension method.
     }
 }

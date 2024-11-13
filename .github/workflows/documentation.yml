@@ -3,8 +3,7 @@ name: DocFx Git Page Deploy
 on:
   push:
     branches:
-      - master
-      - main
+      - stable-release-pages
 
 jobs:
   # Build the documentation

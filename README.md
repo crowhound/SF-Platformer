@@ -9,6 +9,9 @@ Here is the official Unity documentation page if you want to do a full read thro
 [Unity Custom Git Package Documentation](https://docs.unity3d.com/6000.0/Documentation/Manual/upm-git.html#extended)
 
 1. Open up Unity's package manager editor window and click the button with a plus sign at the top left of the package manager window. It should have a small dropdown arrow icon by the button with a plus sign on it.
+
+![install-instructions-1](https://github.com/user-attachments/assets/de316cc8-5498-4496-b702-221b6f2b73f7)
+
    
 2. Choose install package from git url and paste in the following.
 

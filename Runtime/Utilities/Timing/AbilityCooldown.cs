@@ -30,7 +30,7 @@ namespace SF.AbilityModule
             // First set it to false
             IsOnCooldown = false;
             // The CooldownTimer awaitable will return true when the timer finishes.
-            IsOnCooldown = await CoolDownTimer.StartTimer();
+            IsOnCooldown = await CoolDownTimer.StartTimerAsync();
         }
     }
 }

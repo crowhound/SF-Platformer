@@ -23,15 +23,22 @@ namespace SF.Weapons
             _cooldownTimer = new Timer(_fireCooldown, CooldownCompleted);
 
             if(_isAutoFire)
-                Use();
+               Use();
         }
 
-        public virtual void Use()
+        public async virtual void Use()
         {
             if(_projectile == null || _spawnPosition == null)
                 return;
 
-            _cooldownTimer.StartTimer();
+            // If we are not ready to use the weapon, don't use it.
+            if(!_isReady)
+                return;
+
+            // Now set the weapon to be not ready because it is currently being activated already.
+            _isReady = false;
+
+            await _cooldownTimer.StartTimerAsync();
 
             Projectile projectile = GameObject.Instantiate(_projectile);
 

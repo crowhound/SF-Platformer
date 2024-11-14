@@ -1,10 +1,9 @@
-using SF.Characters;
-using SF.Characters.Controllers;
-using SF.StateMachine.AI;
-
 using UnityEngine;
 
-namespace SF.AI
+using SF.Characters;
+using SF.Characters.Controllers;
+
+namespace SF.AIModule.StateMachines
 {
     public abstract class AIState : ScriptableObject
 	{

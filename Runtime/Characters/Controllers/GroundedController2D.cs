@@ -1,12 +1,13 @@
+#if UNITY_EDITOR
+// The two below namespaces are only used in the OnDrawGizmos
+// at the time of typing this comment.
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+#endif
+
 using UnityEngine;
 using SF.Physics;
-using SF.Physics.Collision;
-using SF.Character.Core;
 using System;
-using System.Runtime.InteropServices;
-using System.Collections.Generic;
-
-
 
 #if SF_Utilities
 using SF.Utilities;

@@ -1,9 +1,11 @@
-using SF.Character.Core;
-using SF.Characters.Controllers;
-
+#if DEBUG
 using Unity.Profiling;
+#endif
 
 using UnityEngine;
+
+using SF.Characters.Controllers;
+
 
 namespace SF.Characters
 {

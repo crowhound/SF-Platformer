@@ -1,8 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace SF.Physics.Helpers
+namespace SF.Physics
 {
 	[System.Serializable]
 	public struct BoundsData

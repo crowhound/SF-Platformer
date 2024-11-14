@@ -2,11 +2,7 @@ using System;
 
 using UnityEngine;
 
-using SF.Physics.Collision;
-
-using SF.Character.Core;
 using SF.Physics;
-
 
 namespace SF.Characters.Controllers
 {

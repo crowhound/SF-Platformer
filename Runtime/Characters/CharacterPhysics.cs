@@ -1,8 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace SF.Physics.Character
+namespace SF.Characters.Physics
 {
     [System.Serializable]
     public class CharacterPhysics

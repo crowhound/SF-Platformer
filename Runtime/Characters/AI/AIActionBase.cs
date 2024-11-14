@@ -1,20 +1,15 @@
-using UnityEngine;
+using SF.Characters.Controllers;
 
-namespace SF.Characters.AI
+namespace SF.AIModule
 {
-    /// <summary>
-    /// This is the base class for all AI Actions
-    /// </summary>
-    public class AIActionBase : MonoBehaviour
-    {
-        public void Init()
-        {
-            OnInit();
-        }
+	[System.Serializable]
+	public abstract class AIActionBase : IAIAction
+	{
+		public string Name;
+		public bool IsEnabled = true;
+		protected Controller2D Controller2D;
 
-        protected virtual void OnInit()
-        {
-
-        }
-    }
+		public abstract void Init();
+		public abstract void DoAction();
+	}
 }

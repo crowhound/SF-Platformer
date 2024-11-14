@@ -2,10 +2,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 using SF.InputModule;
-using SF.Physics;
-using System;
 
-namespace SF.AbilityModule.CharacterModule
+namespace SF.AbilityModule.Characters
 {
     public class CrouchAbility : AbilityCore, IInputAbility
     {

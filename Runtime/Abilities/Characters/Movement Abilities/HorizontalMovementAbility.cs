@@ -1,9 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using SF.AbilityModule;
 using SF.InputModule;
 
-namespace SF.Abilities.CharacterModule
+namespace SF.AbilityModule.Characters
 {
     public class HorizontalMovementAbility : AbilityCore, IInputAbility
     {

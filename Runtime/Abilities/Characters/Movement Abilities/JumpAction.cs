@@ -1,10 +1,9 @@
 using System;
 using UnityEngine;
 
-using SF.Abilities.Characters;
 using SF.Characters.Controllers;
 
-namespace SF.Abilities.CharacterModule
+namespace SF.AbilityModule.Characters
 {
     public class JumpAction : CharacterAbility
     {

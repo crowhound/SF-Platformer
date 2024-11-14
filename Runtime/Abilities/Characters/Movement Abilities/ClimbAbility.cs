@@ -1,11 +1,10 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-using SF.AbilityModule;
 using SF.InputModule;
 using SF.Physics;
 
-namespace SF.Abilities.CharacterModule
+namespace SF.AbilityModule.Characters
 {
     public class ClimbAbility : AbilityCore, IInputAbility
     {

@@ -1,6 +1,6 @@
-using SF.AbilityModule;
 using UnityEngine;
-namespace SF.Abilities.Characters
+
+namespace SF.AbilityModule.Characters
 {
     public abstract class CharacterAbility : ICharacterAbility
     {

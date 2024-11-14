@@ -1,13 +1,18 @@
 using UnityEngine;
+
+using SF.Characters;
+using SF.Characters.Controllers;
 using SF.CommandModule;
 using SF.Events;
 using SF.SpawnModule;
-using SF.Characters.Controllers;
-using SF.Characters;
-using SF.Character.Core;
+
 
 namespace SF
 {
+    /// <summary>
+    /// Adds a health system to anything. 
+    /// This does not need to be on a character. You can add this to a crate or anything that wants to be damaged. There are checks in do stuff for character specific objects if you want to.
+    /// </summary>
     public class Health : MonoBehaviour, IDamagable, EventListener<RespawnEvent>
     {
         public CheckPointManager SpawnPoint;
@@ -60,7 +65,8 @@ namespace SF
 
         protected virtual void Kill()
         {
-            _controller.CharacterState.CharacterStatus = CharacterStatus.Dead;
+            if(_controller != null)
+                _controller.CharacterState.CharacterStatus = CharacterStatus.Dead;
 
             if(_character2D != null && !string.IsNullOrEmpty(DeathAnimationName))
                 _character2D.SetAnimationState(DeathAnimationName);

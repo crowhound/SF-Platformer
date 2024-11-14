@@ -1,6 +1,7 @@
-using SF.Character.Core;
-using SF.Characters.Controllers;
 using UnityEngine;
+
+using SF.Characters;
+using SF.Characters.Controllers;
 
 namespace SF.AbilityModule
 {

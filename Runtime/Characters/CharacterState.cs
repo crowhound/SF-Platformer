@@ -1,6 +1,6 @@
 using System;
 
-namespace SF.Character.Core
+namespace SF.Characters
 {
 	public enum CharacterType
 	{

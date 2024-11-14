@@ -2,37 +2,34 @@ using UnityEngine;
 
 namespace SF.ProjectileModule
 {
-    [System.Serializable]
-    public class Projectile : IProjectile
+    public class Projectile : MonoBehaviour, IProjectile
     {
         public float ProjectileSpeed = 5f;
-        public float FireCooldown = 1f;
-        [SerializeField] private bool _isReady = false;
-        
-        [SerializeField] private GameObject ProjectileObject;
-        [SerializeField] private Timer _cooldownTimer;
+
+        private bool _wasInitialized = false;
+
+        private Rigidbody2D _RGB;
 
         public void Init()
         {
-            _cooldownTimer = new Timer(FireCooldown, CooldownCompleted);
-        }
-        public void Fire(Vector2 spawnPoint)
-        {
-            if (ProjectileObject == null || !_isReady)
-                return;
-
-            _isReady = false;
-            _cooldownTimer.StartTimer();
-            
-            var projectile =  GameObject.Instantiate(ProjectileObject, spawnPoint, Quaternion.identity);
-
-            projectile.GetComponent<Rigidbody2D>().linearVelocity = new Vector2(ProjectileSpeed, 0);
+            _RGB = GetComponent<Rigidbody2D>();
+            _wasInitialized = true;
         }
 
-        private void CooldownCompleted()
+        public void Fire(Vector2 spawnPosition)
         {
-            _isReady = true;
-            _cooldownTimer.ResetTimer();
+            if(!_wasInitialized)
+                Init();
+
+            _RGB.linearVelocity = new Vector2(ProjectileSpeed, 0);
+        }
+
+        private void OnBecameInvisible()
+        {
+            // TODO:Make this into a pool system using a custom ObjectPool class to inject components onto the pooled game objects.
+            // gameObject.SetActive(false);
+
+            Destroy(gameObject);
         }
     }
 }

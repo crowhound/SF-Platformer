@@ -3,7 +3,7 @@ using SF.Characters.Controllers;
 
 using UnityEngine;
 
-namespace SF.AI
+namespace SF.AIModule.StateMachines
 {
 	[CreateAssetMenu(fileName = "AI Patrol", menuName = "SF /Data/States/AI/AI Patrol")]
 	public class AIPatrolState : AIState

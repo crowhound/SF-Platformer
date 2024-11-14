@@ -8,7 +8,7 @@ namespace SF.Character.Core
 		Enemy,
 		AI
 	}
-	[System.Flags]
+	[Flags]
 	public enum MovementState
 	{
 		None,
@@ -34,7 +34,7 @@ namespace SF.Character.Core
         Beserk
     }
 
-    [System.Serializable]
+    [Serializable]
 	public class CharacterState
 	{
 		public MovementState MovementState;

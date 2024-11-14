@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using SF.AI;
-
-namespace SF.StateMachine.AI
+namespace SF.AIModule.StateMachines
 {
     public class AIBrain : MonoBehaviour
     {

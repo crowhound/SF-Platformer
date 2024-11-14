@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 using SF.InputModule;
 using SF.Physics;
 
-namespace SF.AbilityModule.CharacterModule
+namespace SF.AbilityModule.Characters
 {
     public class GlideAbility : AbilityCore, IInputAbility
     {

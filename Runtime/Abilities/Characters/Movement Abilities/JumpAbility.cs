@@ -1,10 +1,9 @@
-using SF.AbilityModule;
-using SF.InputModule;
-
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace SF.Abilities.CharacterModule
+using SF.InputModule;
+
+namespace SF.AbilityModule.Characters
 {
     public class JumpAbility : AbilityCore, IInputAbility
     {

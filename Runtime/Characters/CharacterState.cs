@@ -31,7 +31,10 @@ namespace SF.Characters
     public enum StatusEffect
     {
         Normal,
-        Beserk
+        Beserk,
+		Weakened,
+		Bleeding,
+		Confused
     }
 
     [Serializable]

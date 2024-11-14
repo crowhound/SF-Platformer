@@ -10,17 +10,26 @@ namespace SF
         public float Volume;
         public AudioSource SFXSource;
 
+
         public async override Awaitable Use() 
         {
             if (SFXClip == null)
                 return;
-                
-            await  PlayAudio();
+
+            if(IsAsyncCommand)
+                await PlayAudioAsync();
+            else PlayAudio();
         }
 
-        private async Awaitable PlayAudio()
+        private void PlayAudio()
+        {
+            SFXSource.PlayOneShot(SFXClip, Volume);
+        }
+
+        private async Awaitable PlayAudioAsync()
         {
             SFXSource.PlayOneShot(SFXClip,Volume);
+            await Awaitable.MainThreadAsync();
         }
     }
 }

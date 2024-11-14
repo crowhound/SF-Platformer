@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using SF.CommandModule;
 using UnityEngine;
 
@@ -14,9 +12,13 @@ namespace SF
         {
             _setActive = setActive;
         }
-        public async override Awaitable Use()
+        public override async Awaitable Use()
         {
-           _gameObject.SetActive(_setActive);
+            _gameObject.SetActive(_setActive);
+
+            // TODO: This is a temp thing till I fully implement the both the aynsc
+            // and non-async versions.
+            await Awaitable.MainThreadAsync();
         }
     }
 }

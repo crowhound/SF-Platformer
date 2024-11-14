@@ -29,15 +29,25 @@ namespace SF
         {
             RemaingTime = StartingTime;
         }
-
-        public async Awaitable<bool> StartTimer()
+        /// <summary>
+        /// Starts an async timer that when completed raises the 
+        /// <see cref="_onTimerComplete"/> event.
+        /// </summary>
+        /// <returns>
+        /// True when the timer is finished or false while the timer is currently counting down.
+        /// </returns>
+        public async Awaitable<bool> StartTimerAsync()
         {
             ResetTimer();
-            await UpdateTimer();
+            await UpdateTimerAsync();
             return true;
         }
 
-        public async Awaitable UpdateTimer()
+        /// <summary>
+        /// Tells the timer to start updating and counting down asynchronously and invokes the <see cref="_onTimerComplete"/> event when the timer reaches zero.
+        /// </summary>
+        /// <returns></returns>
+        public async Awaitable UpdateTimerAsync()
         {
             while (RemaingTime > 0)
             {

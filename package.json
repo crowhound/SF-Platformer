@@ -13,7 +13,8 @@
     "url": "https://github.com/crowhound"
   },
   "dependencies": {
-    "com.unity.inputsystem": "1.8.0"
+    "com.unity.inputsystem": "1.8.0",
+    "com.unity.cinemachine": "3.1.2"
   },
   "relatedPackages": {},
   "_upm": {

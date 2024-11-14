@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace SF.Physics.Collision
+namespace SF.Physics
 {
 	[System.Serializable]
     public struct CollisionController

@@ -1,4 +1,8 @@
 using System.Collections.Generic;
+
+using SF.Characters;
+using SF.Characters.Controllers;
+
 using UnityEngine;
 
 namespace SF.CommandModule
@@ -8,14 +12,24 @@ namespace SF.CommandModule
         [SerializeField] private bool DoStart = false;
         [SerializeReference] public List<CommandNode> Commands = new List<CommandNode>();
 
-        public void Awake()
+        private void Start()
         {
-        }
+            OnStart();
 
-        public void Start()
-        {
             if (DoStart)
                 StartCommands();
+        }
+
+        protected virtual void OnStart()
+        {
+            foreach (var cmd in Commands)
+            {
+                if(cmd is CharacterCommandNode characterCommand)
+                {
+                    characterCommand.Character2D = GetComponent<Character2D>();
+                    characterCommand.Controller2D = GetComponent<Controller2D>();
+                }    
+            }
         }
 
         public async void StartCommands()

@@ -38,6 +38,9 @@ namespace SF.Physics
 
 
 		/// <summary>
+		/// NOT IMPLEMENTED YET.
+		/// Check the <see cref="AIModule.AICrushAction"/> for the bitwise operator method I would like to implement here.
+		/// 
 		/// Checks if anything in the collision controllers RayCastHit2D array matches the layer mask. 
 		/// This allows reusing the already cached raycast hits for better performance.
 		/// </summary>
@@ -45,6 +48,7 @@ namespace SF.Physics
 		/// <returns></returns>
 		public bool DidHitObjectInLayerMask(LayerMask layerMask)
 		{
+			Debug.Log("The DidHitObjectInLayerMask in CollisionController is not implemented yet and currently always returns true.");
 			return true;
 		}
 	}

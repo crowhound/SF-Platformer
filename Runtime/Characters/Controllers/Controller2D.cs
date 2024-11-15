@@ -12,6 +12,11 @@ using SF.Platformer.Utilities;
 
 namespace SF.Characters.Controllers
 {
+    /// <summary>
+    /// A physics controller used to add custom physics logic to any object. 
+    /// This physics controller adds the ability to invoke events when colliding on per direction basis by
+    /// using the <see cref="CollisionController"/> 
+    /// </summary>
     [RequireComponent(typeof(Rigidbody2D), typeof(BoxCollider2D))]
     public class Controller2D : MonoBehaviour, IForceReciever
     {

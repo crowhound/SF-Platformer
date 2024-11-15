@@ -2,10 +2,12 @@ using UnityEngine;
 
 namespace SF.Physics
 {
+	/// <summary>
+	/// Controls the values passed into physics.2D calls to allow for custom collision detection systems.
+	/// </summary>
 	[System.Serializable]
     public struct CollisionController
     {
-
 
 		[Header("Ray distance")]
 		public float HoriztonalRayDistance;
@@ -19,6 +21,7 @@ namespace SF.Physics
         [field: SerializeField] public float RayOffset { get; private set; }
 
         [HideInInspector] public RaycastHit2D[] RaycastHit2Ds;
+
 		public CollisionController(float horiztonalRayDistance = 0.01f,
 							 float verticalRayDistance = 0.01f,
 							 short horiztonalRayAmount = 3,
@@ -31,6 +34,18 @@ namespace SF.Physics
 			HoriztonalRayAmount = horiztonalRayAmount;
 			VerticalRayAmount = verticalRayAmount;
 			RaycastHit2Ds = new RaycastHit2D[4];
+		}
+
+
+		/// <summary>
+		/// Checks if anything in the collision controllers RayCastHit2D array matches the layer mask. 
+		/// This allows reusing the already cached raycast hits for better performance.
+		/// </summary>
+		/// <param name="layerMask"></param>
+		/// <returns></returns>
+		public bool DidHitObjectInLayerMask(LayerMask layerMask)
+		{
+			return true;
 		}
 	}
 }

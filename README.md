@@ -6,6 +6,13 @@ Heads up during the pre-alpha most things were just committed directly to the ma
 Starting with alpha one we will have a branch for each development release cycle and we will be grouping feature sets into pull requests for organization.
 Example the future audio features will be in a pull-request called Audio-Manager-1. When it is finished, tested, and reviwed than it will be merged into the current release cycle being worked on.
 
+## Demo Videos
+There will be demo videos being recorded as progress is made on the package to show off how to do a few things.
+Here is an example of using the pre-alpha 10 version being worked on to make a crushing ai enemy.
+
+[SF Platformer Crushing AI Demo](https://www.youtube.com/watch?v=jRTSwovfHqQ)
+
+
 ## WIP Documentation.
 Please note the documentation is very early wip. The manual link at the top left is not ready yet. So clicking it does nothing. We are working on videos currently for the manual. 
 Currently somethings are not in the final location for namespaces. In the root SF namespace you will see some classes, structs, or interfaces needing moved to their proper namespaces.

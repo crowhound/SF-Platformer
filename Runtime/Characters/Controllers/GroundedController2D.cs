@@ -27,7 +27,6 @@ namespace SF.Characters.Controllers
 		[NonSerialized] public float ReferenceSpeed;
 
 		[Header("Platform Settings")]
-		public ContactFilter2D PlatformFilter;
         [SerializeField] protected ContactFilter2D OneWayPlatformFilter;
         [SerializeField] public GameObject StandingOnObject { get; protected set; }
 
@@ -77,7 +76,6 @@ namespace SF.Characters.Controllers
 
 		protected Character2D _character;
 		#region Components 
-		protected BoxCollider2D _boxCollider;
 		protected Vector2 _originalColliderSize;
 		protected Vector2 _modifiedColliderSize;
 		protected Vector2 _previousColliderSize;
@@ -108,7 +106,7 @@ namespace SF.Characters.Controllers
 			SideCollisionChecks();
 			CheckOnCollisionActions();
 		}
-		protected virtual void GroundChecks()
+		protected override void GroundChecks()
 		{
 			// This will eventually also show colliding with other things than platforms.
 			CollisionInfo.IsCollidingBelow = RaycastMultiple(Bounds.BottomLeft(), Bounds.BottomRight(), Vector2.down, CollisionController.VerticalRayDistance, PlatformFilter, CollisionController.VerticalRayAmount);
@@ -132,11 +130,7 @@ namespace SF.Characters.Controllers
 				OnGrounded?.Invoke();
 			}
 		}
-		protected virtual void CeilingChecks()
-		{
-			CollisionInfo.IsCollidingAbove = RaycastMultiple(Bounds.TopLeft(), Bounds.TopRight(), Vector2.up, CollisionController.VerticalRayDistance, PlatformFilter, CollisionController.VerticalRayAmount);
-		}
-		protected virtual void SideCollisionChecks()
+		protected override void SideCollisionChecks()
 		{ 
 			// Right Side
 			CollisionInfo.IsCollidingRight = RaycastMultiple(Bounds.TopRight(), Bounds.MiddleRight(), Vector2.right, CollisionController.HoriztonalRayDistance, PlatformFilter, CollisionController.HoriztonalRayAmount);
@@ -157,47 +151,7 @@ namespace SF.Characters.Controllers
 				CollisionInfo.ClimbableSurfaceHit = hit2D;
 		}
 
-		public bool RaycastMultiple(Vector2 origin, Vector2 end, Vector2 direction, float distance, LayerMask layerMask, int numberOfRays = 4)
-		{
-			RaycastHit2D hasHit;
-			Vector2 startPosition;
-			float stepPercent;
-
-			for(int x = 0; x < numberOfRays; x++)
-			{
-				stepPercent = (float)x / (float)(numberOfRays - 1);
-				startPosition = Vector2.Lerp(origin, end, stepPercent);
-				hasHit = Physics2D.Raycast(startPosition, direction, distance, layerMask);
-
-                if(hasHit)
-				{
-
-                    if(direction.x > 0)
-                        CollisionInfo.RightHit = hasHit;
-                    else
-                        CollisionInfo.LeftHit = hasHit;
-
-                    if(direction.y > 0)
-                        CollisionInfo.CeilingHit = hasHit;
-                    else
-                        CollisionInfo.GroundedHit = hasHit;
-
-                    return true;
-				}
-            }
-            return false;
-		}
-
-		public bool RaycastMultiple(Vector2 origin, Vector2 end, Vector2 direction, float distance, ContactFilter2D contactFilter2D, int numberOfRays = 4)
-		{
-			return RaycastMultiple(origin, end, direction, distance, contactFilter2D.layerMask, numberOfRays);
-		}
-
 		#endregion
-		protected override void OnPreFixedUpdate()
-		{
-			Bounds = _boxCollider.bounds;
-		}
         protected void OnStatusEffectChanged(StatusEffect statusEffect)
         {
 			if(statusEffect == StatusEffect.Beserk)

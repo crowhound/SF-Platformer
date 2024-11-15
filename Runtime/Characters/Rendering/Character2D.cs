@@ -99,7 +99,7 @@ namespace SF.Characters
         }
 		private void SpriteFlip(Vector2 direction)
 		{
-			if(!CanTurnAround)
+			if(!CanTurnAround || _spriteRend == null)
 				return;
 
             _spriteRend.flipX = StartedFacingRight

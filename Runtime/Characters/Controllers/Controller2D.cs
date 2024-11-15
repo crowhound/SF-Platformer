@@ -12,7 +12,7 @@ using SF.Platformer.Utilities;
 
 namespace SF.Characters.Controllers
 {
-    [RequireComponent(typeof(Rigidbody2D))]
+    [RequireComponent(typeof(Rigidbody2D), typeof(BoxCollider2D))]
     public class Controller2D : MonoBehaviour, IForceReciever
     {
         [Header("Physics Properties")]
@@ -226,7 +226,7 @@ namespace SF.Characters.Controllers
                     if(direction.y > 0)
                         CollisionInfo.CeilingHit = hasHit;
                     else
-                        CollisionInfo.GroundedHit = hasHit;
+                        CollisionInfo.BelowHit = hasHit;
 
                     return true;
                 }

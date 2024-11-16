@@ -133,10 +133,10 @@ namespace SF.Characters.Controllers
 		protected override void SideCollisionChecks()
 		{ 
 			// Right Side
-			CollisionInfo.IsCollidingRight = RaycastMultiple(Bounds.TopRight(), Bounds.MiddleRight(), Vector2.right, CollisionController.HoriztonalRayDistance, PlatformFilter, CollisionController.HoriztonalRayAmount);
+			CollisionInfo.IsCollidingRight = RaycastMultiple(Bounds.TopRight(), Bounds.BottomRight(), Vector2.right, CollisionController.HoriztonalRayDistance, PlatformFilter, CollisionController.HoriztonalRayAmount);
 
 			// Left Side
-			CollisionInfo.IsCollidingLeft = RaycastMultiple(Bounds.TopLeft(), Bounds.MiddleLeft(), Vector2.left, CollisionController.HoriztonalRayDistance, PlatformFilter, CollisionController.HoriztonalRayAmount);
+			CollisionInfo.IsCollidingLeft = RaycastMultiple(Bounds.TopLeft(), Bounds.BottomLeft(), Vector2.left, CollisionController.HoriztonalRayDistance, PlatformFilter, CollisionController.HoriztonalRayAmount);
 
 			RaycastHit2D hit2D;
 
@@ -227,7 +227,6 @@ namespace SF.Characters.Controllers
 		protected override void Move()
 		{
 			CalculateSlope();
-
 
 			base.Move();
 		}
@@ -363,6 +362,14 @@ namespace SF.Characters.Controllers
                 startPosition = Vector2.Lerp(origin, end, stepPercent);
                 _listOfPoints.Add(startPosition);
                 _listOfPoints.Add(startPosition + new Vector2(CollisionController.HoriztonalRayDistance, 0));
+            }
+
+            for(int x = 0; x < numberOfRays; x++) // Left
+            {
+                stepPercent = (float)x / (float)(numberOfRays - 1);
+                startPosition = Vector2.Lerp(Bounds.BottomLeft(), Bounds.TopLeft(), stepPercent);
+                _listOfPoints.Add(startPosition);
+                _listOfPoints.Add(startPosition - new Vector2(CollisionController.HoriztonalRayDistance, 0));
             }
 
             ReadOnlySpan<Vector3> pointsAsSpan = CollectionsMarshal.AsSpan(_listOfPoints);

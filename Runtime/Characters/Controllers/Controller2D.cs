@@ -141,7 +141,8 @@ namespace SF.Characters.Controllers
                 _externalVelocity = Vector2.zero;
             }
 
-            _rigidbody2D.linearVelocity = _calculatedVelocity;
+            _rigidbody2D.MovePosition((Vector2)transform.position + _calculatedVelocity * Time.deltaTime);
+            //_rigidbody2D.linearVelocity = _calculatedVelocity;
         }
 
 
@@ -202,10 +203,10 @@ namespace SF.Characters.Controllers
         protected virtual void SideCollisionChecks()
         {
             // Right Side
-            CollisionInfo.IsCollidingRight = RaycastMultiple(Bounds.TopRight(), Bounds.MiddleRight(), Vector2.right, CollisionController.HoriztonalRayDistance, PlatformFilter, CollisionController.HoriztonalRayAmount);
+            CollisionInfo.IsCollidingRight = RaycastMultiple(Bounds.TopRight(), Bounds.BottomRight(), Vector2.right, CollisionController.HoriztonalRayDistance, PlatformFilter, CollisionController.HoriztonalRayAmount);
 
             // Left Side
-            CollisionInfo.IsCollidingLeft = RaycastMultiple(Bounds.TopLeft(), Bounds.MiddleLeft(), Vector2.left, CollisionController.HoriztonalRayDistance, PlatformFilter, CollisionController.HoriztonalRayAmount);
+            CollisionInfo.IsCollidingLeft = RaycastMultiple(Bounds.TopLeft(), Bounds.BottomLeft(), Vector2.left, CollisionController.HoriztonalRayDistance, PlatformFilter, CollisionController.HoriztonalRayAmount);
         }
 
         public bool RaycastMultiple(Vector2 origin, Vector2 end, Vector2 direction, float distance, LayerMask layerMask, int numberOfRays = 4)
@@ -213,7 +214,6 @@ namespace SF.Characters.Controllers
             RaycastHit2D hasHit;
             Vector2 startPosition;
             float stepPercent;
-
             for(int x = 0; x < numberOfRays; x++)
             {
                 stepPercent = (float)x / (float)(numberOfRays - 1);
@@ -222,20 +222,20 @@ namespace SF.Characters.Controllers
 
                 if(hasHit)
                 {
-
-                    if(direction.x > 0)
+                    if(direction.x > 0 && direction.y == 0 )
                         CollisionInfo.RightHit = hasHit;
-                    else
+                    else if(direction.x < 0 && direction.y == 0)
                         CollisionInfo.LeftHit = hasHit;
 
                     if(direction.y > 0)
                         CollisionInfo.CeilingHit = hasHit;
-                    else
+                    else if(direction.y < 0)
                         CollisionInfo.BelowHit = hasHit;
-
+                    Debug.Log(direction + " : index " + x);
                     return true;
                 }
             }
+
             return false;
         }
 

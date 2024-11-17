@@ -108,20 +108,29 @@ namespace SF.Characters.Controllers
 		}
 		protected override void GroundChecks()
 		{
-			// This will eventually also show colliding with other things than platforms.
-			CollisionInfo.IsCollidingBelow = RaycastMultiple(Bounds.BottomLeft(), Bounds.BottomRight(), Vector2.down, CollisionController.VerticalRayDistance, PlatformFilter, CollisionController.VerticalRayAmount);
+            // This will eventually also show colliding with other things than platforms.
 
-			if(IsJumping)
+            CollisionInfo.BelowHit = Physics2D.BoxCast(
+                        Bounds.BottomCenter(),
+                        new Vector2(Bounds.size.x, .02f),
+                        0,
+                        Vector2.down,
+                        CollisionController.HoriztonalRayDistance,
+                        PlatformFilter.layerMask
+                    );
+            CollisionInfo.IsCollidingBelow = CollisionInfo.BelowHit;
+
+            if(IsJumping)
 			{
 				IsGrounded = false;
 				return;
 			}
 
-			IsGrounded = RaycastMultiple(Bounds.BottomLeft() + new Vector2(CollisionController.RayOffset,0), Bounds.BottomRight() - new Vector2(CollisionController.RayOffset, 0), Vector2.down, CollisionController.VerticalRayDistance, PlatformFilter, CollisionController.VerticalRayAmount);
+			IsGrounded = CollisionInfo.IsCollidingBelow;
 
-
-			if(IsGrounded)
+            if(IsGrounded)
 				_calculatedVelocity.y = 0;
+
 			// If grounded last frame, but grounded this frame call OnGrounded
 			if(!_wasGroundedLastFrame && IsGrounded)
 			{
@@ -131,12 +140,12 @@ namespace SF.Characters.Controllers
 			}
 		}
 		protected override void SideCollisionChecks()
-		{ 
-			// Right Side
-			CollisionInfo.IsCollidingRight = RaycastMultiple(Bounds.TopRight(), Bounds.BottomRight(), Vector2.right, CollisionController.HoriztonalRayDistance, PlatformFilter, CollisionController.HoriztonalRayAmount);
+		{
+            // Right Side
+            CollisionInfo.IsCollidingRight = Physics2D.BoxCast(Bounds.MiddleRight(), new Vector2(.02f,Bounds.size.y), 0, Vector2.right, CollisionController.HoriztonalRayDistance, PlatformFilter.layerMask);
 
-			// Left Side
-			CollisionInfo.IsCollidingLeft = RaycastMultiple(Bounds.TopLeft(), Bounds.BottomLeft(), Vector2.left, CollisionController.HoriztonalRayDistance, PlatformFilter, CollisionController.HoriztonalRayAmount);
+            // Left Side
+            CollisionInfo.IsCollidingLeft = Physics2D.BoxCast(Bounds.MiddleLeft(), new Vector2(.02f, Bounds.size.y), 0, Vector2.left, CollisionController.HoriztonalRayDistance, PlatformFilter.layerMask);
 
 			RaycastHit2D hit2D;
 
@@ -200,6 +209,7 @@ namespace SF.Characters.Controllers
 					-CurrentPhysics.TerminalVelocity,
 					CurrentPhysics.MaxUpForce);
 			}
+
 		}
 
 		public virtual void CalculateSlope()
@@ -226,7 +236,7 @@ namespace SF.Characters.Controllers
 
 		protected override void Move()
 		{
-			CalculateSlope();
+			//CalculateSlope();
 
 			base.Move();
 		}

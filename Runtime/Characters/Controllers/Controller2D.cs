@@ -131,7 +131,6 @@ namespace SF.Characters.Controllers
         #region Movement Calculations
         protected virtual void Move()
         {
-
             if(CharacterState.CharacterStatus == CharacterStatus.Dead)
                 _calculatedVelocity = Vector2.zero;
 
@@ -141,8 +140,7 @@ namespace SF.Characters.Controllers
                 _externalVelocity = Vector2.zero;
             }
 
-            _rigidbody2D.MovePosition((Vector2)transform.position + _calculatedVelocity * Time.deltaTime);
-            //_rigidbody2D.linearVelocity = _calculatedVelocity;
+            _rigidbody2D.linearVelocity = _calculatedVelocity;
         }
 
 
@@ -231,7 +229,6 @@ namespace SF.Characters.Controllers
                         CollisionInfo.CeilingHit = hasHit;
                     else if(direction.y < 0)
                         CollisionInfo.BelowHit = hasHit;
-                    Debug.Log(direction + " : index " + x);
                     return true;
                 }
             }

@@ -1,3 +1,5 @@
+using System;
+
 using SF.Characters.Controllers;
 
 using UnityEngine;
@@ -12,9 +14,9 @@ namespace SF.AIModule
 	[System.Serializable]
 	public abstract class AIActionBase : MonoBehaviour, IAIAction
 	{
-		public string Name;
 		public bool IsEnabled = true;
-		public bool IsControlledByAIBrain = false;
+        [NonSerialized] public bool IsControlledByAIBrain = false;
+
         protected Controller2D Controller2D;
 
 		public abstract void Init();

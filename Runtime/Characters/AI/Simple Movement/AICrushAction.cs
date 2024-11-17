@@ -31,10 +31,9 @@ namespace SF.AIModule
 		[SerializeField] private bool _isInstantKill = false;
 
 
-		public AICrushAction(Controller2D controller, string name = "AI Crush")
+		public AICrushAction(Controller2D controller)
 		{
 			Controller2D = controller;
-			Name = name;
 		}
 
         private void Awake()

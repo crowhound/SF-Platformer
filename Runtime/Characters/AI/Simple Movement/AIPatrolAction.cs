@@ -7,10 +7,9 @@ namespace SF.AIModule
 	{
 		
 		[SerializeField] private bool _startingRight = true;
-		public AIPatrolAction(Controller2D controller, string name = "AI Patrol")
+		public AIPatrolAction(Controller2D controller)
 		{
 			Controller2D = controller;
-			Name = name;
 		}
 
 		public override void Init()

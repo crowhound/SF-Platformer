@@ -1,6 +1,7 @@
 using UnityEngine;
 
 using SF.Characters.Controllers;
+using SF.SpawnModule;
 
 namespace SF.AIModule
 {

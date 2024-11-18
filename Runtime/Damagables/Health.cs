@@ -4,10 +4,8 @@ using SF.Characters;
 using SF.Characters.Controllers;
 using SF.CommandModule;
 using SF.Events;
-using SF.SpawnModule;
 
-
-namespace SF
+namespace SF.SpawnModule
 {
     /// <summary>
     /// Adds a health system to anything. 
@@ -15,9 +13,6 @@ namespace SF
     /// </summary>
     public class Health : MonoBehaviour, IDamagable, EventListener<RespawnEvent>
     {
-        public CheckPointManager SpawnPoint;
-
-        public CommandController CommandController;
         public int CurrentHealth = 10;
         public int MaxHealth = 10;
 
@@ -43,9 +38,6 @@ namespace SF
         }
         public virtual void TakeDamage(int damage)
         {
-            if (CommandController != null)
-                CommandController.StartCommands();
-
             if(_character2D != null && !string.IsNullOrEmpty(HitAnimationName))
                 _character2D.SetAnimationState(HitAnimationName,HitAnimationDuration);
 
@@ -82,17 +74,14 @@ namespace SF
             }
 		}
 
-        protected void Respawn()
+        protected virtual void Respawn()
         {
-            if(SpawnPoint == null)
-                return;
-
             if(_controller != null)
+            {
                 _controller.Reset();
+                _controller.CharacterState.CharacterStatus = CharacterStatus.Alive;
+            }
 
-            if(SpawnPoint.CurrentCheckPoint != null)
-                transform.position = SpawnPoint.CurrentCheckPoint.transform.position;
-            
             CurrentHealth = MaxHealth;
         }
 

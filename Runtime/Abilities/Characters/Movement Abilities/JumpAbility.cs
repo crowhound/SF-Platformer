@@ -23,7 +23,7 @@ namespace SF.AbilityModule.Characters
 
         protected override bool CheckAbilityRequirements()
         {
-            if(!_isInitialized || !IsEnabled || _controller2d == null)
+            if(!_isInitialized || !enabled || _controller2d == null)
                 return false;
 
             // If we are currently gliding don't jump. 

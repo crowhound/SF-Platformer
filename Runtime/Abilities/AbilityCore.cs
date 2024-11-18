@@ -10,15 +10,11 @@ namespace SF.AbilityModule
 	/// </summary>
     public abstract class AbilityCore : MonoBehaviour, IAbility
     {
+		[Header("Blocking States")]
 		public MovementState BlockingMovementStates;
 		public CharacterStatus BlockingCharacterStatus = CharacterStatus.Dead;
 
-		public bool IsEnabled = true;
-		public bool InitOnStart = true;
-		public bool DoOnUpdate = false;
-		[SerializeField] protected bool _isInitialized = false;
-		
-
+		protected bool _isInitialized = false;		
 
 		protected GroundedController2D _controller2d;
 
@@ -74,7 +70,7 @@ namespace SF.AbilityModule
 		/// <returns></returns>
 		protected bool CanStartAbility()
 		{
-            if(!_isInitialized || !IsEnabled || _controller2d == null)
+            if(!_isInitialized || !enabled || _controller2d == null)
                 return false;
 
             // If we are in a blocking movement state or blocking movement status don't start ability.

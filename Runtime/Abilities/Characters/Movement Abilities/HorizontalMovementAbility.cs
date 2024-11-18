@@ -6,7 +6,8 @@ namespace SF.AbilityModule.Characters
 {
     public class HorizontalMovementAbility : AbilityCore, IInputAbility
     {
-		[SerializeField] private bool _isRunningToggleable = true;
+
+        [SerializeField] private bool _isRunningToggleable = true;
         #region Input Actions
         private void OnInputMove(InputAction.CallbackContext context)
 		{

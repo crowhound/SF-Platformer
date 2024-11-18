@@ -108,7 +108,7 @@ namespace SF.AbilityModule.Characters
 
         private void OnDisable()
         {
-            if(InputManager.Instance == null) return;
+            if(InputManager.Controls == null) return;
 
             InputManager.Controls.Player.Interact.performed -= OnClimb;
             InputManager.Controls.Player.Move.performed -= OnClimbMove;

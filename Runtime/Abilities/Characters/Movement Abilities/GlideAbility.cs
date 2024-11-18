@@ -56,7 +56,7 @@ namespace SF.AbilityModule.Characters
 
         private void OnDisable()
         {
-            if(InputManager.Instance == null) return;
+            if(InputManager.Controls == null) return;
 
             InputManager.Controls.Player.Glide.performed -= OnInputGlide;
             InputManager.Controls.Player.Jump.performed -= OnMidGlideJump;

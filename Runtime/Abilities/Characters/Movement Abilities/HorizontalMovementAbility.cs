@@ -18,7 +18,9 @@ namespace SF.AbilityModule.Characters
 		}
         private void OnMoveInputRun(InputAction.CallbackContext context)
         {
-			_controller2d.IsRunning = (_isRunningToggleable)
+			Debug.Log("Started Running");
+
+            _controller2d.IsRunning = (_isRunningToggleable)
 				? !_controller2d.IsRunning
 				: context.ReadValue<float>() > 0;
                 
@@ -48,7 +50,7 @@ namespace SF.AbilityModule.Characters
 
         private void OnDisable()
 		{
-			if(InputManager.Instance == null) return;
+			if(InputManager.Controls == null) return;
 
 			InputManager.Controls.Player.Move.performed -= OnInputMove;
 			InputManager.Controls.Player.Move.canceled -= OnInputMove;

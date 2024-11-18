@@ -18,8 +18,6 @@ namespace SF.AbilityModule.Characters
 		}
         private void OnMoveInputRun(InputAction.CallbackContext context)
         {
-			Debug.Log("Started Running");
-
             _controller2d.IsRunning = (_isRunningToggleable)
 				? !_controller2d.IsRunning
 				: context.ReadValue<float>() > 0;

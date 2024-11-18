@@ -11,7 +11,7 @@ namespace SF.AbilityModule
     public abstract class AbilityCore : MonoBehaviour, IAbility
     {
 		public MovementState BlockingMovementStates;
-		public CharacterStatus BlockingCharacterStatus;
+		public CharacterStatus BlockingCharacterStatus = CharacterStatus.Dead;
 
 		public bool IsEnabled = true;
 		public bool InitOnStart = true;

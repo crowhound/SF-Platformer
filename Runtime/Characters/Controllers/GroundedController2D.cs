@@ -27,7 +27,6 @@ namespace SF.Characters.Controllers
 		[NonSerialized] public float ReferenceSpeed;
 
 		[Header("Platform Settings")]
-		public ContactFilter2D PlatformFilter;
         [SerializeField] protected ContactFilter2D OneWayPlatformFilter;
         [SerializeField] public GameObject StandingOnObject { get; protected set; }
 
@@ -77,7 +76,6 @@ namespace SF.Characters.Controllers
 
 		protected Character2D _character;
 		#region Components 
-		protected BoxCollider2D _boxCollider;
 		protected Vector2 _originalColliderSize;
 		protected Vector2 _modifiedColliderSize;
 		protected Vector2 _previousColliderSize;
@@ -108,22 +106,31 @@ namespace SF.Characters.Controllers
 			SideCollisionChecks();
 			CheckOnCollisionActions();
 		}
-		protected virtual void GroundChecks()
+		protected override void GroundChecks()
 		{
-			// This will eventually also show colliding with other things than platforms.
-			CollisionInfo.IsCollidingBelow = RaycastMultiple(Bounds.BottomLeft(), Bounds.BottomRight(), Vector2.down, CollisionController.VerticalRayDistance, PlatformFilter, CollisionController.VerticalRayAmount);
+            // This will eventually also show colliding with other things than platforms.
 
-			if(IsJumping)
+            CollisionInfo.BelowHit = Physics2D.BoxCast(
+                        Bounds.BottomCenter(),
+                        new Vector2(Bounds.size.x, .02f),
+                        0,
+                        Vector2.down,
+                        CollisionController.HoriztonalRayDistance,
+                        PlatformFilter.layerMask
+                    );
+            CollisionInfo.IsCollidingBelow = CollisionInfo.BelowHit;
+
+            if(IsJumping)
 			{
 				IsGrounded = false;
 				return;
 			}
 
-			IsGrounded = RaycastMultiple(Bounds.BottomLeft() + new Vector2(CollisionController.RayOffset,0), Bounds.BottomRight() - new Vector2(CollisionController.RayOffset, 0), Vector2.down, CollisionController.VerticalRayDistance, PlatformFilter, CollisionController.VerticalRayAmount);
+			IsGrounded = CollisionInfo.IsCollidingBelow;
 
-
-			if(IsGrounded)
+            if(IsGrounded)
 				_calculatedVelocity.y = 0;
+
 			// If grounded last frame, but grounded this frame call OnGrounded
 			if(!_wasGroundedLastFrame && IsGrounded)
 			{
@@ -132,17 +139,13 @@ namespace SF.Characters.Controllers
 				OnGrounded?.Invoke();
 			}
 		}
-		protected virtual void CeilingChecks()
+		protected override void SideCollisionChecks()
 		{
-			CollisionInfo.IsCollidingAbove = RaycastMultiple(Bounds.TopLeft(), Bounds.TopRight(), Vector2.up, CollisionController.VerticalRayDistance, PlatformFilter, CollisionController.VerticalRayAmount);
-		}
-		protected virtual void SideCollisionChecks()
-		{ 
-			// Right Side
-			CollisionInfo.IsCollidingRight = RaycastMultiple(Bounds.TopRight(), Bounds.MiddleRight(), Vector2.right, CollisionController.HoriztonalRayDistance, PlatformFilter, CollisionController.HoriztonalRayAmount);
+            // Right Side
+            CollisionInfo.IsCollidingRight = Physics2D.BoxCast(Bounds.MiddleRight(), new Vector2(.02f,Bounds.size.y), 0, Vector2.right, CollisionController.HoriztonalRayDistance, PlatformFilter.layerMask);
 
-			// Left Side
-			CollisionInfo.IsCollidingLeft = RaycastMultiple(Bounds.TopLeft(), Bounds.MiddleLeft(), Vector2.left, CollisionController.HoriztonalRayDistance, PlatformFilter, CollisionController.HoriztonalRayAmount);
+            // Left Side
+            CollisionInfo.IsCollidingLeft = Physics2D.BoxCast(Bounds.MiddleLeft(), new Vector2(.02f, Bounds.size.y), 0, Vector2.left, CollisionController.HoriztonalRayDistance, PlatformFilter.layerMask);
 
 			RaycastHit2D hit2D;
 
@@ -157,47 +160,7 @@ namespace SF.Characters.Controllers
 				CollisionInfo.ClimbableSurfaceHit = hit2D;
 		}
 
-		public bool RaycastMultiple(Vector2 origin, Vector2 end, Vector2 direction, float distance, LayerMask layerMask, int numberOfRays = 4)
-		{
-			RaycastHit2D hasHit;
-			Vector2 startPosition;
-			float stepPercent;
-
-			for(int x = 0; x < numberOfRays; x++)
-			{
-				stepPercent = (float)x / (float)(numberOfRays - 1);
-				startPosition = Vector2.Lerp(origin, end, stepPercent);
-				hasHit = Physics2D.Raycast(startPosition, direction, distance, layerMask);
-
-                if(hasHit)
-				{
-
-                    if(direction.x > 0)
-                        CollisionInfo.RightHit = hasHit;
-                    else
-                        CollisionInfo.LeftHit = hasHit;
-
-                    if(direction.y > 0)
-                        CollisionInfo.CeilingHit = hasHit;
-                    else
-                        CollisionInfo.GroundedHit = hasHit;
-
-                    return true;
-				}
-            }
-            return false;
-		}
-
-		public bool RaycastMultiple(Vector2 origin, Vector2 end, Vector2 direction, float distance, ContactFilter2D contactFilter2D, int numberOfRays = 4)
-		{
-			return RaycastMultiple(origin, end, direction, distance, contactFilter2D.layerMask, numberOfRays);
-		}
-
 		#endregion
-		protected override void OnPreFixedUpdate()
-		{
-			Bounds = _boxCollider.bounds;
-		}
         protected void OnStatusEffectChanged(StatusEffect statusEffect)
         {
 			if(statusEffect == StatusEffect.Beserk)
@@ -246,6 +209,7 @@ namespace SF.Characters.Controllers
 					-CurrentPhysics.TerminalVelocity,
 					CurrentPhysics.MaxUpForce);
 			}
+
 		}
 
 		public virtual void CalculateSlope()
@@ -272,8 +236,7 @@ namespace SF.Characters.Controllers
 
 		protected override void Move()
 		{
-			CalculateSlope();
-
+			//CalculateSlope();
 
 			base.Move();
 		}
@@ -409,6 +372,14 @@ namespace SF.Characters.Controllers
                 startPosition = Vector2.Lerp(origin, end, stepPercent);
                 _listOfPoints.Add(startPosition);
                 _listOfPoints.Add(startPosition + new Vector2(CollisionController.HoriztonalRayDistance, 0));
+            }
+
+            for(int x = 0; x < numberOfRays; x++) // Left
+            {
+                stepPercent = (float)x / (float)(numberOfRays - 1);
+                startPosition = Vector2.Lerp(Bounds.BottomLeft(), Bounds.TopLeft(), stepPercent);
+                _listOfPoints.Add(startPosition);
+                _listOfPoints.Add(startPosition - new Vector2(CollisionController.HoriztonalRayDistance, 0));
             }
 
             ReadOnlySpan<Vector3> pointsAsSpan = CollectionsMarshal.AsSpan(_listOfPoints);

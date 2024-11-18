@@ -12,10 +12,10 @@ namespace SF.Physics
 	public struct CollisionInfo
 	{
         /// <summary>
-        /// The raycast hit detected during the ground collision check for the character controller being used.
+        /// The raycast hit detected during the ground collision check for below the character controller being used.
         /// This will return false when checked if null in an if statement when there is nothing being hit.
         /// </summary>
-        public RaycastHit2D GroundedHit;
+        public RaycastHit2D BelowHit;
         /// <summary>
         /// The raycast hit detected during the ceiling collision check for the character controller being used.
         /// This will return false when checked if null in an if statement when there is nothing being hit.

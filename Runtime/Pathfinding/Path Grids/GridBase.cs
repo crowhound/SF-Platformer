@@ -7,19 +7,18 @@ namespace SF
 {
     public class GridBase : MonoBehaviour
     {
-        // For testing purposes.
-        public GameObject Player;
-
+        public bool DebugDrawGrid = false;
         public LayerMask UnwalkableMask;
         public Vector2 GridWorldSize;
         public float NodeRadius = 0.5f;
 
-        public List<PathNodeBase> Path = new();
         private PathNodeBase[,] _grid;
         private float _nodeDiameter;
         int _gridSizeX, _gridSizeY;
 
-        private void Start()
+        public int MaxSize => _gridSizeX * _gridSizeY;
+
+        private void Awake()
         {
             _nodeDiameter = NodeRadius * 2;
             _gridSizeX = Mathf.RoundToInt(GridWorldSize.x / _nodeDiameter);
@@ -27,6 +26,7 @@ namespace SF
 
             GenerateGrid();
         }
+
 
         private void GenerateGrid()
         {
@@ -62,7 +62,7 @@ namespace SF
                         continue;
 
                     // Make sure we don't leave the grid if we are on the outside of it.
-                    Vector2 checkPosition =  pathNode.NodePosition + new Vector2(x,y);
+                    Vector2 checkPosition =  pathNode.GridPosition + new Vector2(x,y);
 
                     if(checkPosition.x >= 0 // Not outside the minimum x of the grid.
                         && checkPosition.x < _gridSizeX  // Not outside the maximum x of the grid.
@@ -97,11 +97,15 @@ namespace SF
 
             int x = Mathf.RoundToInt((_gridSizeX - 1) * percentX);
             int y = Mathf.RoundToInt((_gridSizeY - 1) * percentY);
+
             return _grid[x, y];
         }
 
         private void OnDrawGizmos()
         {
+            if(!DebugDrawGrid)
+                return;
+
             Gizmos.DrawWireCube(transform.position, new Vector3(GridWorldSize.x, GridWorldSize.y, 0));
 
             if(_grid != null)
@@ -111,22 +115,6 @@ namespace SF
                     Gizmos.color = (node.IsTraversable) ? Color.white : Color.red;
 
                     Gizmos.DrawWireCube(node.WorldPosition,Vector3.one * (_nodeDiameter - 0.1f));
-                }
-
-                if(Player != null)
-                {
-                    PathNodeBase playerNode = NodeFromWorldPoint(Player.transform.position);
-                    Gizmos.color = Color.yellow;
-                    Gizmos.DrawWireCube(playerNode.WorldPosition, Vector3.one * (_nodeDiameter - 0.1f));
-                }
-                
-                if(Path != null || Path.Count > 0)
-                {
-                    Gizmos.color = Color.green;
-                    foreach(PathNodeBase node in Path)
-                    {
-                        Gizmos.DrawWireCube(node.WorldPosition, Vector3.one * (_nodeDiameter - 0.1f));
-                    }
                 }
             }
         }

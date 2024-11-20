@@ -42,66 +42,58 @@ namespace SF.Pathfinding
      *          
      *       }
      */
-
+    [RequireComponent(typeof(PathRequetManager))]
     public class PathAStar : MonoBehaviour
     {
+        private PathRequetManager _pathRequestManager;
         [SerializeField] private GridBase _grid;
-
-        public Transform StartTransform;
-        public Transform GoalTransform;
 
         private PathNodeBase _startNode;
         private PathNodeBase _goalNode;
 
-        private List<PathNodeBase> _openNodes = new();
-        private HashSet<PathNodeBase> _closedNodes = new();
-
         private void Awake()
         {
+            _pathRequestManager = GetComponent<PathRequetManager>();
             if(_grid == null)
                 _grid = GetComponent<GridBase>();
         }
 
-        private void Start()
+        public void StartFindPath(Vector2 startPos, Vector2 targetPos)
         {
-            if(StartTransform != null && GoalTransform != null)
-                FindPath(StartTransform.position, GoalTransform.position);
+            FindPath(startPos,targetPos);
         }
 
-        private void FindPath(Vector2 startPotion, Vector2 goalPosition)
+        private async void FindPath(Vector2 startPotion, Vector2 goalPosition)
         {
             if(_grid == null)
                 return;
 
+            Vector2[] wayPoints = new Vector2[0];
+            bool pathSuccess = false;
+
             _startNode = _grid.NodeFromWorldPoint(startPotion);
             _goalNode = _grid.NodeFromWorldPoint(goalPosition);
 
-            _openNodes.Clear();
-            _closedNodes.Clear();
+            // If either nodes are not traveserable don'tnbother finding a path.
+            if(!_startNode.IsTraversable || !_goalNode.IsTraversable)
+                return;
+
+            Heap<PathNodeBase> _openNodes = new Heap<PathNodeBase>(_grid.MaxSize);
+            HashSet<PathNodeBase> _closedNodes = new();
 
             _openNodes.Add(_startNode);
 
             while(_openNodes.Count > 0)
             {
-                PathNodeBase currentNode = _openNodes[0];
+                PathNodeBase currentNode = _openNodes.RemoveFirst();
 
-                // Set it to one because the current node was set to the 0 index already.
-                for(int i = 1; i < _openNodes.Count; i++)
-                {
-                    
-                    if(_openNodes[i].FCost < currentNode.FCost || 
-                        (_openNodes[i].FCost == currentNode.FCost && _openNodes[i].HCost < currentNode.HCost))
-                            currentNode = _openNodes[i];
-                }
-
-                _openNodes.Remove(currentNode);
                 _closedNodes.Add(currentNode);
 
                 // We found our goal node.
                 if(currentNode == _goalNode)
                 {
-                    RetracePath(_startNode, _goalNode);
-                    return;
+                    pathSuccess = true;
+                    break;
                 }
 
 
@@ -123,8 +115,14 @@ namespace SF.Pathfinding
                     }
                 }
             }
+            await Awaitable.EndOfFrameAsync();
+            if(pathSuccess)
+                wayPoints = RetracePath(_startNode, _goalNode);
+
+            _pathRequestManager.FinishedProcessingPath(wayPoints,pathSuccess);
         }
-        private void RetracePath(PathNodeBase startNode, PathNodeBase goalNode)
+
+        private Vector2[] RetracePath(PathNodeBase startNode, PathNodeBase goalNode)
         {
             List<PathNodeBase> pathNodes = new();
 
@@ -135,15 +133,37 @@ namespace SF.Pathfinding
                 pathNodes.Add(currentNode);
                 currentNode = currentNode.ParentNodeOnPath;
             }
+            Vector2[] waypoints = SimplifyPath(pathNodes);
+            System.Array.Reverse(waypoints);
+            return waypoints;
 
-            pathNodes.Reverse();
-            _grid.Path = pathNodes;
+        }
+
+        private Vector2[] SimplifyPath(List<PathNodeBase> path)
+        {
+            List<Vector2> waypoints = new List<Vector2>();
+            Vector2 directionOld = Vector2.zero;
+
+            for(int i = 1; i < path.Count; i++)
+            {
+                Vector2 directionNew = new Vector2(
+                    path[i-1].GridPosition.x - path[i].GridPosition.x, 
+                    path[i - 1].GridPosition.y - path[i].GridPosition.y
+                    );
+
+                if(directionNew != directionOld)
+                    waypoints.Add(path[i].WorldPosition);
+
+                directionOld = directionNew;
+            }
+
+            return waypoints.ToArray();
         }
 
         private float GetDistance(PathNodeBase nodeA, PathNodeBase nodeB)
         {
-            float distanceX = Mathf.Abs(nodeA.NodePosition.x - nodeB.NodePosition.x);
-            float distanceY = Mathf.Abs(nodeA.NodePosition.y - nodeB.NodePosition.y);
+            float distanceX = Mathf.Abs(nodeA.GridPosition.x - nodeB.GridPosition.x);
+            float distanceY = Mathf.Abs(nodeA.GridPosition.y - nodeB.GridPosition.y);
 
             // Handling Diagonals for longer horizontal distances
             if(distanceX > distanceY)

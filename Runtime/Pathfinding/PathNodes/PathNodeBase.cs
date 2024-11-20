@@ -5,7 +5,7 @@ using UnityEngine;
 namespace SF.Pathfinding
 {
     [System.Serializable]
-    public class PathNodeBase
+    public class PathNodeBase : IHeapItem<PathNodeBase>
     {
         public float GCost; // Distance to the starting node.
         public float HCost; // Distance to the ending node.
@@ -16,20 +16,38 @@ namespace SF.Pathfinding
         /// <summary>
         /// The node position on the current grid this node is on.
         /// </summary>
-        public Vector2 NodePosition;
+        public Vector2 GridPosition;
         public Vector2 WorldPosition;
         private bool _isTraversable;
+
+        private int _heapIndex;
+        public int HeapIndex
+        {
+            get => _heapIndex;
+            set => _heapIndex = value;
+        }
+
         public virtual bool IsTraversable
         {
             get { return _isTraversable; }
             set { _isTraversable = value; }
         }
 
-        public PathNodeBase(bool isTraversable, Vector2 worldPosition,Vector2 nodePosition)
+        public PathNodeBase(bool isTraversable, Vector2 worldPosition,Vector2 gridPosition)
         {
             IsTraversable = isTraversable;
             WorldPosition = worldPosition;
-            NodePosition = nodePosition;
+            GridPosition = gridPosition;
+        }
+
+        public int CompareTo(PathNodeBase nodeToCompare)
+        {
+            int compare = FCost.CompareTo(nodeToCompare.FCost);
+            
+            if(compare == 0)
+                compare = HCost.CompareTo(nodeToCompare.HCost);
+
+            return -compare;
         }
     }
 }

@@ -8,9 +8,9 @@ namespace SF.Pathfinding
 {
     public class PathRequetManager : MonoBehaviour
     {
-        private static PathRequetManager _instance;
+        public static PathRequetManager _instance;
 
-        private Queue<PathRequest> _pathRequestQueue = new Queue<PathRequest>();
+        public Queue<PathRequest> _pathRequestQueue = new Queue<PathRequest>();
         private PathRequest _currentPathRequest;
 
         private bool _isProcessingAPath;

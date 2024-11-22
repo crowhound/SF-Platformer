@@ -112,6 +112,8 @@ namespace SF.Pathfinding
 
                         if(!_openNodes.Contains(neighbourNode))
                             _openNodes.Add(neighbourNode);
+                        else
+                            _openNodes.UpdateItem(neighbourNode);
                     }
                 }
             }
@@ -144,15 +146,18 @@ namespace SF.Pathfinding
             List<Vector2> waypoints = new List<Vector2>();
             Vector2 directionOld = Vector2.zero;
 
+            //Need to add the last point.
+            waypoints.Add(path[0].WorldPosition);
+
             for(int i = 1; i < path.Count; i++)
             {
                 Vector2 directionNew = new Vector2(
                     path[i-1].GridPosition.x - path[i].GridPosition.x, 
-                    path[i - 1].GridPosition.y - path[i].GridPosition.y
+                    path[i-1].GridPosition.y - path[i].GridPosition.y
                     );
 
                 if(directionNew != directionOld)
-                    waypoints.Add(path[i].WorldPosition);
+                    waypoints.Add(path[i-1].WorldPosition);
 
                 directionOld = directionNew;
             }

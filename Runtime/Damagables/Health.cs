@@ -9,8 +9,12 @@ namespace SF.SpawnModule
     /// </summary>
     public class Health : MonoBehaviour, IDamagable, EventListener<RespawnEvent>
     {
+
         public int CurrentHealth = 10;
         public int MaxHealth = 10;
+
+        [Header("SFX")]
+        [SerializeField] protected AudioClip _deathSFX;
 
         public virtual void TakeDamage(int damage)
         {
@@ -33,6 +37,9 @@ namespace SF.SpawnModule
 
         protected virtual void Kill()
         {
+            if(_deathSFX != null)
+                AudioManager.Instance.PlayOneShot(_deathSFX);
+
             gameObject.SetActive(false);
         }
 

@@ -1,5 +1,5 @@
 using SF.Characters.Controllers;
-using SF.Utilities;
+using SF.Platformer.Utilities;
 
 using UnityEngine;
 
@@ -7,14 +7,14 @@ namespace SF
 {
     public class PatrolAIState : MonoBehaviour
 	{
-        private GroundedController2D _controller;
+        private Controller2D _controller;
         public bool StartingRight = true;
 		public bool DoesTurnOnHoles = true;
 		private bool _isHoleAhead;
 
 		private void Awake()
 		{
-			_controller = GetComponent<GroundedController2D>();
+			_controller = GetComponent<Controller2D>();
 		}
 
 		private void Start()

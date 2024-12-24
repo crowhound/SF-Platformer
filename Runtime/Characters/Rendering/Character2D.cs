@@ -64,6 +64,9 @@ namespace SF.Characters
         /// </summary>
         private void SetAnimations()
 		{
+			if(_animator == null 
+				|| _animator.runtimeAnimatorController == null)
+					return;
 #if DEBUG
             s_AnimationUpdateMarker.Begin();
 #endif

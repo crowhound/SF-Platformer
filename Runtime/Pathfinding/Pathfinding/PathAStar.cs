@@ -74,7 +74,7 @@ namespace SF.Pathfinding
             _startNode = _grid.NodeFromWorldPoint(startPotion);
             _goalNode = _grid.NodeFromWorldPoint(goalPosition);
 
-            // If either nodes are not traveserable don'tnbother finding a path.
+            // If either nodes are not traveserable don't bother finding a path.
             if(!_startNode.IsTraversable || !_goalNode.IsTraversable)
                 return;
 
@@ -124,6 +124,67 @@ namespace SF.Pathfinding
             _pathRequestManager.FinishedProcessingPath(wayPoints,pathSuccess);
         }
 
+        public async Awaitable<Vector2[]> FindPathAwaitable(Vector2 startPotion, Vector2 goalPosition)
+        {
+            if(_grid == null)
+                return null;
+
+            Vector2[] wayPoints = new Vector2[0];
+            bool pathSuccess = false;
+
+            _startNode = _grid.NodeFromWorldPoint(startPotion);
+            _goalNode = _grid.NodeFromWorldPoint(goalPosition);
+
+            // If either nodes are not traveserable don't bother finding a path.
+            if(!_startNode.IsTraversable || !_goalNode.IsTraversable)
+                return null;
+
+            Heap<PathNodeBase> _openNodes = new Heap<PathNodeBase>(_grid.MaxSize);
+            HashSet<PathNodeBase> _closedNodes = new();
+
+            _openNodes.Add(_startNode);
+
+            while(_openNodes.Count > 0)
+            {
+                PathNodeBase currentNode = _openNodes.RemoveFirst();
+
+                _closedNodes.Add(currentNode);
+
+                // We found our goal node.
+                if(currentNode == _goalNode)
+                {
+                    pathSuccess = true;
+                    break;
+                }
+
+
+                foreach(PathNodeBase neighbourNode in _grid.GetNeighbours(currentNode))
+                {
+                    if(!neighbourNode.IsTraversable || _closedNodes.Contains(neighbourNode))
+                        continue;
+
+                    float newMovementCostToNeighbour = currentNode.GCost + GetDistance(currentNode, neighbourNode);
+
+                    if(newMovementCostToNeighbour < neighbourNode.GCost || !_openNodes.Contains(neighbourNode))
+                    {
+                        neighbourNode.GCost = newMovementCostToNeighbour;
+                        neighbourNode.HCost = GetDistance(neighbourNode, _goalNode);
+                        neighbourNode.ParentNodeOnPath = currentNode;
+
+                        if(!_openNodes.Contains(neighbourNode))
+                            _openNodes.Add(neighbourNode);
+                        else
+                            _openNodes.UpdateItem(neighbourNode);
+                    }
+                }
+            }
+            await Awaitable.EndOfFrameAsync();
+            if(pathSuccess)
+                wayPoints = RetracePath(_startNode, _goalNode);
+
+            return wayPoints;
+        }
+
         private Vector2[] RetracePath(PathNodeBase startNode, PathNodeBase goalNode)
         {
             List<PathNodeBase> pathNodes = new();
@@ -145,9 +206,6 @@ namespace SF.Pathfinding
         {
             List<Vector2> waypoints = new List<Vector2>();
             Vector2 directionOld = Vector2.zero;
-
-            //Need to add the last point.
-            waypoints.Add(path[0].WorldPosition);
 
             for(int i = 1; i < path.Count; i++)
             {

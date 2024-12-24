@@ -14,12 +14,12 @@ namespace SF.Pathfinding
         private PathRequest _currentPathRequest;
 
         private bool _isProcessingAPath;
-        private PathAStar _pathFinding;
+        [HideInInspector] public PathAStar PathFinding;
 
         private void Awake()
         {
             _instance = this;
-            _pathFinding = GetComponent<PathAStar>();
+            PathFinding = GetComponent<PathAStar>();
         }
 
         public static void RequestPath(Vector2 pathStart, Vector2 pathEnd, Action<Vector2[], bool> callback)
@@ -35,7 +35,7 @@ namespace SF.Pathfinding
             {
                 _currentPathRequest = _pathRequestQueue.Dequeue();
                 _isProcessingAPath = true;
-                _pathFinding.StartFindPath(_currentPathRequest.PathStart, _currentPathRequest.PathEnd);
+                PathFinding.StartFindPath(_currentPathRequest.PathStart, _currentPathRequest.PathEnd);
             }
         }
 

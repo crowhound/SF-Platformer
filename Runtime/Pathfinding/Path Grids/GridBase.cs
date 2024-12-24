@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 using SF.Pathfinding;
@@ -97,6 +98,10 @@ namespace SF
 
             int x = Mathf.RoundToInt((_gridSizeX - 1) * percentX);
             int y = Mathf.RoundToInt((_gridSizeY - 1) * percentY);
+
+            // Make sure we don't leave the grid if the target moves out of it.
+            x = Math.Min(Mathf.RoundToInt(GridWorldSize.x), x);
+            y = Math.Min(Mathf.RoundToInt(GridWorldSize.y), y);
 
             return _grid[x, y];
         }

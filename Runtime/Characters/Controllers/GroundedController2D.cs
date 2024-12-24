@@ -17,18 +17,13 @@ using SF.Platformer.Utilities;
 
 namespace SF.Characters.Controllers
 {
-	[RequireComponent(typeof(BoxCollider2D))]
+	[RequireComponent(typeof(BoxCollider2D), typeof(Character2D))]
 	public class GroundedController2D : Controller2D
 	{
-
-		/// <summary>
-		/// Reference speed if used for passing in a value in horizontal calculatin based on running or not.
-		/// </summary>
-		[NonSerialized] public float ReferenceSpeed;
-
 		[Header("Platform Settings")]
         [SerializeField] protected ContactFilter2D OneWayPlatformFilter;
-        [SerializeField] public GameObject StandingOnObject { get; protected set; }
+		[SerializeField] protected LayerMask MovingPlatformLayer;
+        [field:SerializeField] public GameObject StandingOnObject { get; protected set; }
 
 
 		[Header("Booleans")]
@@ -62,14 +57,15 @@ namespace SF.Characters.Controllers
 			}
 		}
 		[SerializeField] private bool _isClimbing = false;
-		[Header("Slope Settings")]
-		[SerializeField] private bool _useSlopes = false;
-		public float SlopeLimit = 55;
-		public float SlopeSlipLimit = 35;
-		[SerializeField] protected Vector2 _slopeNormal;
-		public float StandingOnSlopeAngle;
-		public bool OnSlope = false;
-		protected Vector2 _slopeSideDirection;
+		
+		// [Header("Slope Settings")]
+		private bool _useSlopes = false;
+        private float SlopeLimit = 55;
+        private float SlopeSlipLimit = 35;
+		protected Vector2 _slopeNormal;
+        private float StandingOnSlopeAngle;
+        private bool OnSlope = false;
+        private Vector2 _slopeSideDirection;
 
 		protected int OneWayFilterBitMask => PlatformFilter.layerMask & OneWayPlatformFilter.layerMask;
 		public Action OnGrounded;
@@ -86,21 +82,13 @@ namespace SF.Characters.Controllers
 			_boxCollider = GetComponent<BoxCollider2D>();
 			Bounds = _boxCollider.bounds;
 			_originalColliderSize = _boxCollider.size;
-		}
-		protected override void OnStart()
-		{
-			CharacterState.StatusEffectChanged += OnStatusEffectChanged;
-			DefaultPhysics.GroundSpeed = Mathf.Clamp(DefaultPhysics.GroundSpeed, 0, DefaultPhysics.GroundMaxSpeed);
 
-			PlatformFilter.useLayerMask = true;
-
-			CurrentPhysics = DefaultPhysics;
-			ReferenceSpeed = CurrentPhysics.GroundSpeed;
 		}
+
 		#region Collision Calculations
 		protected override void ColisionChecks()
 		{
-			_wasGroundedLastFrame = IsGrounded;
+            _wasGroundedLastFrame = IsGrounded;
 			GroundChecks();
 			CeilingChecks();
 			SideCollisionChecks();
@@ -108,44 +96,69 @@ namespace SF.Characters.Controllers
 		}
 		protected override void GroundChecks()
 		{
-            // This will eventually also show colliding with other things than platforms.
-
-            CollisionInfo.BelowHit = Physics2D.BoxCast(
+			Bounds = _boxCollider.bounds;
+			// This will eventually also show colliding with other things than platforms.
+            CollisionInfo.BelowHit = DebugBoxCast(
                         Bounds.BottomCenter(),
                         new Vector2(Bounds.size.x, .02f),
                         0,
                         Vector2.down,
-                        CollisionController.HoriztonalRayDistance,
+                        CollisionController.VerticalRayDistance,
                         PlatformFilter.layerMask
                     );
-            CollisionInfo.IsCollidingBelow = CollisionInfo.BelowHit;
+
+			// If we did collide with something below.
+			if(CollisionInfo.BelowHit)
+			{
+                // If we are standing on something keep track of it. This can be useful for things like moving platforms.
+                StandingOnObject = CollisionInfo.BelowHit.collider.gameObject;
+
+                // Only set the transform if we already are not a child of another gameobject.
+                // If we don't do this than we will cnstantly be restuck to the moving platforms transform.
+                if(transform.parent == null)
+                    transform.SetParent(CollisionInfo.BelowHit.collider.gameObject.transform);
+
+                CollisionInfo.IsCollidingBelow = true;
+                IsGrounded = true;
+            }
+			else // If we are not colliding with anything below.
+			{
+				StandingOnObject = null;
+
+                // If we are attacthed to another object and was standing on something last frame
+                // unattach the character from the object.
+                if(transform.parent != null)
+					transform.SetParent(null);
+
+                CollisionInfo.IsCollidingBelow = false;
+                IsGrounded = false;
+            }
 
             if(IsJumping)
 			{
 				IsGrounded = false;
+				// We return to prevent and grounded collision resetting velocity for y on the
+				// frame we are leaving the ground.
 				return;
 			}
 
-			IsGrounded = CollisionInfo.IsCollidingBelow;
-
+			// At this point we are not jumping or falling
             if(IsGrounded)
 				_calculatedVelocity.y = 0;
 
-			// If grounded last frame, but grounded this frame call OnGrounded
+			// If not grounded last frame, but grounded this frame call OnGrounded
 			if(!_wasGroundedLastFrame && IsGrounded)
 			{
-				if(_calculatedVelocity.y < 0)
-					_calculatedVelocity.y = 0;
 				OnGrounded?.Invoke();
 			}
-		}
+        }
 		protected override void SideCollisionChecks()
 		{
             // Right Side
-            CollisionInfo.IsCollidingRight = Physics2D.BoxCast(Bounds.MiddleRight(), new Vector2(.02f,Bounds.size.y), 0, Vector2.right, CollisionController.HoriztonalRayDistance, PlatformFilter.layerMask);
+            CollisionInfo.IsCollidingRight = Physics2D.BoxCast(Bounds.MiddleRight(), new Vector2(.02f,Bounds.size.y - CollisionController.RayOffset), 0, Vector2.right, CollisionController.HoriztonalRayDistance, PlatformFilter.layerMask);
 
             // Left Side
-            CollisionInfo.IsCollidingLeft = Physics2D.BoxCast(Bounds.MiddleLeft(), new Vector2(.02f, Bounds.size.y), 0, Vector2.left, CollisionController.HoriztonalRayDistance, PlatformFilter.layerMask);
+            CollisionInfo.IsCollidingLeft = Physics2D.BoxCast(Bounds.MiddleLeft(), new Vector2(.02f, Bounds.size.y - CollisionController.RayOffset), 0, Vector2.left, CollisionController.HoriztonalRayDistance, PlatformFilter.layerMask);
 
 			RaycastHit2D hit2D;
 
@@ -161,11 +174,7 @@ namespace SF.Characters.Controllers
 		}
 
 		#endregion
-        protected void OnStatusEffectChanged(StatusEffect statusEffect)
-        {
-			if(statusEffect == StatusEffect.Beserk)
-				GetComponent<SpriteRenderer>().color = Color.red;
-        }
+
         protected override void CalculateHorizontal()
 		{
 			if(IsClimbing)
@@ -188,7 +197,10 @@ namespace SF.Characters.Controllers
 					_calculatedVelocity.x = 0;
 				// Moving left
 				else if(Direction.x < 0 && CollisionInfo.IsCollidingLeft)
+				{
+
 					_calculatedVelocity.x = 0;
+				}
 			}
 			else
 			{
@@ -237,6 +249,8 @@ namespace SF.Characters.Controllers
 		protected override void Move()
 		{
 			//CalculateSlope();
+			// Note to self: If we are standing on a platform and we move with the platform we gain the velocity of the platform ontop of our own. 
+			// FIX THIS or the character becomes a mach 10 rocket sometimes.
 
 			base.Move();
 		}
@@ -334,6 +348,8 @@ namespace SF.Characters.Controllers
 			}
 		}
 
+       
+
 #if UNITY_EDITOR
 
         private readonly List<Vector3> _listOfPoints = new();
@@ -342,25 +358,12 @@ namespace SF.Characters.Controllers
         {
             _listOfPoints.Clear();
             _boxCollider = (_boxCollider == null) ? GetComponent<BoxCollider2D>() : _boxCollider;
-            Bounds = _boxCollider.bounds;
 
             Vector2 startPosition;
             float stepPercent;
             int numberOfRays = CollisionController.VerticalRayAmount;
             Vector2 origin = Bounds.BottomLeft();
             Vector2 end = Bounds.BottomRight();
-
-            for(int x = 0; x < numberOfRays; x++) // Down
-            {
-                stepPercent = (float)x / (float)(numberOfRays - 1);
-                startPosition = Vector2.Lerp(origin, end, stepPercent);
-                if(x == 0)
-                    startPosition += new Vector2(CollisionController.RayOffset, 0);
-                if(x == numberOfRays - 1)
-                    startPosition -= new Vector2(CollisionController.RayOffset, 0);
-                _listOfPoints.Add(startPosition);
-                _listOfPoints.Add(startPosition - new Vector2(0, CollisionController.VerticalRayDistance));
-            }
 
             numberOfRays = CollisionController.HoriztonalRayAmount;
             origin = Bounds.TopRight();

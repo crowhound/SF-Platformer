@@ -8,6 +8,8 @@ namespace SF.Physics
 	[System.Serializable]
     public struct CollisionController
     {
+		[Header("Collision Corection")]
+		public float SkinWidth;
 
 		[Header("Ray distance")]
 		public float HoriztonalRayDistance;
@@ -26,13 +28,15 @@ namespace SF.Physics
 							 float verticalRayDistance = 0.01f,
 							 short horiztonalRayAmount = 3,
 							 short verticalRayAmount = 3,
-							 float horiztonalOffset = 0.01f)
+							 float horiztonalOffset = 0.01f,
+							 float skinWidth = 0.02f)
 		{
 			RayOffset = horiztonalOffset;
 			HoriztonalRayDistance = horiztonalRayDistance;
 			VerticalRayDistance = verticalRayDistance;
 			HoriztonalRayAmount = horiztonalRayAmount;
 			VerticalRayAmount = verticalRayAmount;
+			SkinWidth = skinWidth;
 			RaycastHit2Ds = new RaycastHit2D[4];
 		}
 

@@ -1,12 +1,11 @@
-using UnityEngine;
 using SF.Events;
+
+using UnityEngine;
 
 namespace SF.SpawnModule
 {
     public class PlayerHealth : CharacterHealth, IDamagable
     {
-        [UnityEngine.SerializeField] private CheckPointManager SpawnPoint;
-
         protected override void Kill()
         {
             base.Kill();
@@ -18,11 +17,13 @@ namespace SF.SpawnModule
 
         protected override void Respawn()
         {
-            if(SpawnPoint == null)
+            // TODO: Make the PlayerRespawn event pass in the check points position to
+            // use it to move the player.
+            if(CheckPointManager.Instance == null)
                 return;
 
-            if(SpawnPoint.CurrentCheckPoint != null)
-                transform.position = SpawnPoint.CurrentCheckPoint.transform.position;
+            if(CheckPointManager.Instance.CurrentCheckPoint != null)
+                transform.position = CheckPointManager.Instance.CurrentCheckPoint.transform.position;
 
             base.Respawn();
         }

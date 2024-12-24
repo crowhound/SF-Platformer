@@ -36,7 +36,6 @@ namespace SF
             if(_currentLives == 0)
             {
                 // Do a game over event.
-                Debug.Log("YOU GOT GAMED OVER SON");
             }
             LivesEvent.Trigger(LivesEventTypes.ChangedLives);
         }

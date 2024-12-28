@@ -16,6 +16,9 @@ namespace SF.AbilityModule.Characters
 
         public bool CanJumpInfinitely = false;
 
+        [Header("Jumping SFX")]
+        [SerializeField] private AudioClip _jumpSFX;
+
         protected override void OnInitialize()
         {
             _controller2d.OnGrounded += ResetJumps;
@@ -23,7 +26,7 @@ namespace SF.AbilityModule.Characters
 
         protected override bool CheckAbilityRequirements()
         {
-            if(!_isInitialized || !IsEnabled || _controller2d == null)
+            if(!_isInitialized || !enabled || _controller2d == null)
                 return false;
 
             // If we are currently gliding don't jump. 
@@ -52,7 +55,10 @@ namespace SF.AbilityModule.Characters
             _controller2d.IsFalling = false;
             _controller2d.IsClimbing = false;
 
-            // TODO: Only add the running heigh bonus to the first jump.
+            if(_jumpSFX != null)
+                AudioManager.Instance.PlayOneShot(_jumpSFX);
+
+            // TODO: Only add the running height bonus to the first jump.
             _controller2d.SetVerticalVelocity(CalculatedJumpHeight);
 		}
 
@@ -65,11 +71,15 @@ namespace SF.AbilityModule.Characters
 		{
 			InputManager.Controls.Player.Enable();
 			InputManager.Controls.Player.Jump.performed += OnInputJump;
+            
+            // Have to check for null becuase you can have OnEnable run sometimes before initialization from the ability controller.
+            if(_controller2d != null)
+                _controller2d.OnGrounded += ResetJumps;
 		}
 
         private void OnDisable()
 		{
-			if(InputManager.Instance == null) return;
+			if(InputManager.Controls == null) return;
 
 			InputManager.Controls.Player.Jump.performed -= OnInputJump;
 			_controller2d.OnGrounded -= ResetJumps;

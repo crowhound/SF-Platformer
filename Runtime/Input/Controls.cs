@@ -118,6 +118,15 @@ namespace SF.InputModule
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PauseToggle"",
+                    ""type"": ""Button"",
+                    ""id"": ""4b0faaac-98d0-49d5-ac3b-e77d56a694bc"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -127,7 +136,7 @@ namespace SF.InputModule
                     ""path"": ""<Gamepad>/leftStick"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": "";Gamepad"",
+                    ""groups"": "";Gamepad;Controller"",
                     ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -227,6 +236,61 @@ namespace SF.InputModule
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""Controller Stick"",
+                    ""id"": ""33e94bf8-0391-47cb-852f-7de7766a1ceb"",
+                    ""path"": ""2DVector"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""dfdc3dcb-3867-4274-a746-704669bac884"",
+                    ""path"": ""<Joystick>/stick/up"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""down"",
+                    ""id"": ""b41a9925-9c61-4466-8ce1-a2c35b0be20d"",
+                    ""path"": ""<Joystick>/stick/down"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""d1d59c4d-3c62-4d77-b895-605529817fb0"",
+                    ""path"": ""<Joystick>/stick/left"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""d60c7590-f162-4616-afb0-56246d44b75d"",
+                    ""path"": ""<Joystick>/stick/right"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
                     ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
@@ -399,7 +463,7 @@ namespace SF.InputModule
                 {
                     ""name"": """",
                     ""id"": ""49d56c72-6227-42fd-a745-470a2f3fb18b"",
-                    ""path"": ""<HID::Bensussen Deutsch & Associates,Inc.(BDA) Core (Plus) Wired Controller>/button3"",
+                    ""path"": ""<HID::Bensussen Deutsch & Associates,Inc.(BDA) Core (Plus) Wired Controller>/button2"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Controller"",
@@ -409,8 +473,41 @@ namespace SF.InputModule
                 },
                 {
                     ""name"": """",
+                    ""id"": ""bc1fcd95-6022-4adc-ada2-e3788ed35f99"",
+                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Jump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""14c7c93c-29fc-4b79-8ef4-68eed3909d5e"",
                     ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Running"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a7481ef5-fe13-4e98-a2c7-728890cb831c"",
+                    ""path"": ""<HID::Bensussen Deutsch & Associates,Inc.(BDA) Core (Plus) Wired Controller>/button4"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Running"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1286cf61-8b64-4139-ac0c-5a083844dbea"",
+                    ""path"": ""<Gamepad>/buttonNorth"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -492,6 +589,50 @@ namespace SF.InputModule
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Interact"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3dd95914-d09e-4376-9413-762fff5b194b"",
+                    ""path"": ""<HID::Bensussen Deutsch & Associates,Inc.(BDA) Core (Plus) Wired Controller>/button3"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Interact"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9231e512-9d34-43f3-b4cb-286d209803ca"",
+                    ""path"": ""<Gamepad>/buttonWest"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Interact"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""59dc1261-4618-4877-a54a-41ac86a103dd"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PauseToggle"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5d760f1a-b0fa-4bb1-95ba-6825f1683325"",
+                    ""path"": ""<Gamepad>/start"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PauseToggle"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1061,6 +1202,7 @@ namespace SF.InputModule
             m_Player_Glide = m_Player.FindAction("Glide", throwIfNotFound: true);
             m_Player_Crouch = m_Player.FindAction("Crouch", throwIfNotFound: true);
             m_Player_Interact = m_Player.FindAction("Interact", throwIfNotFound: true);
+            m_Player_PauseToggle = m_Player.FindAction("PauseToggle", throwIfNotFound: true);
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
             m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1150,6 +1292,7 @@ namespace SF.InputModule
         private readonly InputAction m_Player_Glide;
         private readonly InputAction m_Player_Crouch;
         private readonly InputAction m_Player_Interact;
+        private readonly InputAction m_Player_PauseToggle;
         public struct PlayerActions
         {
             private @Controls m_Wrapper;
@@ -1164,6 +1307,7 @@ namespace SF.InputModule
             public InputAction @Glide => m_Wrapper.m_Player_Glide;
             public InputAction @Crouch => m_Wrapper.m_Player_Crouch;
             public InputAction @Interact => m_Wrapper.m_Player_Interact;
+            public InputAction @PauseToggle => m_Wrapper.m_Player_PauseToggle;
             public InputActionMap Get() { return m_Wrapper.m_Player; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -1203,6 +1347,9 @@ namespace SF.InputModule
                 @Interact.started += instance.OnInteract;
                 @Interact.performed += instance.OnInteract;
                 @Interact.canceled += instance.OnInteract;
+                @PauseToggle.started += instance.OnPauseToggle;
+                @PauseToggle.performed += instance.OnPauseToggle;
+                @PauseToggle.canceled += instance.OnPauseToggle;
             }
 
             private void UnregisterCallbacks(IPlayerActions instance)
@@ -1237,6 +1384,9 @@ namespace SF.InputModule
                 @Interact.started -= instance.OnInteract;
                 @Interact.performed -= instance.OnInteract;
                 @Interact.canceled -= instance.OnInteract;
+                @PauseToggle.started -= instance.OnPauseToggle;
+                @PauseToggle.performed -= instance.OnPauseToggle;
+                @PauseToggle.canceled -= instance.OnPauseToggle;
             }
 
             public void RemoveCallbacks(IPlayerActions instance)
@@ -1411,6 +1561,7 @@ namespace SF.InputModule
             void OnGlide(InputAction.CallbackContext context);
             void OnCrouch(InputAction.CallbackContext context);
             void OnInteract(InputAction.CallbackContext context);
+            void OnPauseToggle(InputAction.CallbackContext context);
         }
         public interface IUIActions
         {

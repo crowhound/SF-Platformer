@@ -2,6 +2,7 @@ using SF.Events;
 using SF.SpawnModule;
 
 using UnityEngine;
+using UnityEngine.Audio;
 
 namespace SF.CollectableModule
 {
@@ -10,8 +11,13 @@ namespace SF.CollectableModule
         public int Score;
 		[SerializeField] private bool ShouldRespawn = true;
 
+		[SerializeField] private AudioClip _collectSFX;
+
 		public void Collect()
         {
+			if(_collectSFX != null)
+				AudioManager.Instance.PlayOneShot(_collectSFX);
+
             ScoreEvent.Trigger(ScoreEventTypes.ScoreIncrease,Score);
 			gameObject.SetActive(false);
         }

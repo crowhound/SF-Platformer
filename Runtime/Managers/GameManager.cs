@@ -14,11 +14,67 @@ namespace SF
 		TransformTransition // Player being moved within a scene, but has no control over the player. Think teleporting.
 	}
 
+	/// <summary>
+	/// The current play state of the game loop that describes what type of logic loop is being updated.
+	/// </summary>
+	public enum GamePlayState
+	{
+		Playing = 0,
+		Paused = 1,
+		MainMenu = 2
+	}
+
+    [DefaultExecutionOrder(-1)]
     public class GameManager : MonoBehaviour
     {
+		public GameControlState ControlState;
+		public GamePlayState PlayState;
+
 		public LivesManager LivesManager;
 
-		private void OnEnable()
+        public const string ManagerObjName = "Game Wide Managers";
+        public const string ManagerObjTag = "Game Manager";
+
+        private static GameManager _instance;
+        public static GameManager Instance
+        {
+            get
+            {
+                if(_instance == null)
+                {
+                    _instance = FindFirstObjectByType<GameManager>();
+
+                    // If no AudioManager was found in the scene make one than set it as the instance for the AudioManager.
+                    if(_instance == null)
+                    {
+                        GameObject go = GameObject.FindGameObjectWithTag("ManagerObjTag");
+
+                        if(go == null)
+                        {
+                            go = new GameObject(ManagerObjName, typeof(GameManager));
+                            Instantiate(go);
+                        }
+
+                        _instance = go.GetComponent<GameManager>();
+                    }
+                }
+
+                return _instance;
+            }
+            set
+            {
+                if(_instance == null)
+                    _instance = value;
+            }
+        }
+
+        private void Awake()
+        {
+            Instance = this;
+            Application.targetFrameRate = 60;
+        }
+
+        private void OnEnable()
 		{
 			LivesManager.RegisterEventListeners();
 		}

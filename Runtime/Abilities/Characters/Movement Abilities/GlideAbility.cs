@@ -19,7 +19,7 @@ namespace SF.AbilityModule.Characters
 
         protected override bool CheckAbilityRequirements()
         {
-            if(!_isInitialized || !IsEnabled || _controller2d == null)
+            if(!_isInitialized || !enabled || _controller2d == null)
                 return false;
 
             // If we are grounded we don't need to glide.
@@ -56,7 +56,7 @@ namespace SF.AbilityModule.Characters
 
         private void OnDisable()
         {
-            if(InputManager.Instance == null) return;
+            if(InputManager.Controls == null) return;
 
             InputManager.Controls.Player.Glide.performed -= OnInputGlide;
             InputManager.Controls.Player.Jump.performed -= OnMidGlideJump;

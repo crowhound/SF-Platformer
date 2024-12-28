@@ -20,6 +20,13 @@ namespace SF.Characters.Controllers
     [RequireComponent(typeof(Rigidbody2D), typeof(BoxCollider2D))]
     public class Controller2D : MonoBehaviour, IForceReciever
     {
+        /// <summary>
+		/// Reference speed if used for passing in a value in horizontal calculatin based on running or not.
+		/// </summary>
+		[NonSerialized] public float ReferenceSpeed;
+
+        public float DistanceToGround;
+
         [Header("Physics Properties")]
         public MovementProperties DefaultPhysics = new(new Vector2(5, 5));
         public MovementProperties CurrentPhysics = new(new Vector2(5, 5));
@@ -43,9 +50,11 @@ namespace SF.Characters.Controllers
         #region Components 
         protected BoxCollider2D _boxCollider;
         protected Rigidbody2D _rigidbody2D;
-        [NonSerialized] public Bounds Bounds;
         #endregion
 
+        #region
+        [NonSerialized] public Bounds Bounds;
+        #endregion
         [Header("Collision Data")]
         public CollisionInfo CollisionInfo;
         public CollisionController CollisionController = new(0.05f, 0.02f, 3, 4);
@@ -76,9 +85,22 @@ namespace SF.Characters.Controllers
             // Even flying enemies need colliders to hurt the player. 
             _rigidbody2D = _rigidbody2D != null ? _rigidbody2D : GetComponent<Rigidbody2D>();
             _boxCollider = _boxCollider != null ? _boxCollider : GetComponent<BoxCollider2D>();
-            _rigidbody2D.freezeRotation = true;
+            SetComponentSetting();
             OnInit();
         }
+
+        private void SetComponentSetting()
+        {
+            if(_boxCollider != null)
+                _boxCollider.isTrigger = false;
+
+            if(_rigidbody2D != null)
+            {
+                _rigidbody2D.bodyType = RigidbodyType2D.Dynamic;
+                _rigidbody2D.freezeRotation = true;
+            }
+        }
+
         protected virtual void OnInit()
         {
 
@@ -91,13 +113,22 @@ namespace SF.Characters.Controllers
         {
             // Need to check why this is in twice. Gravity Scale is being set also in OnAwake.
             _rigidbody2D.gravityScale = 0;
+
+            CharacterState.StatusEffectChanged += OnStatusEffectChanged;
+            DefaultPhysics.GroundSpeed = Mathf.Clamp(DefaultPhysics.GroundSpeed, 0, DefaultPhysics.GroundMaxSpeed);
+
+            PlatformFilter.useLayerMask = true;
+
+            CurrentPhysics = DefaultPhysics;
+            ReferenceSpeed = CurrentPhysics.GroundSpeed;
+
             OnStart();
         }
         protected virtual void OnStart()
         {
-
         }
-        private void FixedUpdate()
+
+        private void Update()
         {
             Bounds = _boxCollider.bounds;
 
@@ -140,13 +171,49 @@ namespace SF.Characters.Controllers
                 _externalVelocity = Vector2.zero;
             }
 
-            _rigidbody2D.linearVelocity = _calculatedVelocity;
+            //Vector2 newPosition = (Vector2)transform.position + _calculatedVelocity * Time.deltaTime; 
+            //_rigidbody2D.MovePosition(newPosition);
+
+            transform.Translate(_calculatedVelocity * Time.deltaTime);
+
+            if(CollisionInfo.BelowHit)
+            {
+                if(transform.position.y < CollisionInfo.BelowHit.point.y)
+                    transform.position = CollisionInfo.BelowHit.point + new Vector2(0, 0.25f);
+            }
+
         }
 
 
         protected virtual void CalculateHorizontal()
         {
+            if(Direction.x != 0)
+            {
+                // We only have to do a single clamp because than Direction.x takes care of it being negative or not when being multiplied.
+                ReferenceSpeed = Mathf.Clamp(ReferenceSpeed, 0, CurrentPhysics.GroundMaxSpeed);
+
+                // TODO: When turning around erase previously directional velocity.
+                // If it is kept the player could slide in the previous direction for a second before running the new direction on smaller ground acceleration values.
+                _calculatedVelocity.x = Mathf.MoveTowards(_calculatedVelocity.x, ReferenceSpeed * Direction.x, CurrentPhysics.GroundAcceleration);
+
+                // Moving right
+                if(Direction.x > 0 && CollisionInfo.IsCollidingRight)
+                    _calculatedVelocity.x = 0;
+                // Moving left
+                else if(Direction.x < 0 && CollisionInfo.IsCollidingLeft)
+                {
+
+                    _calculatedVelocity.x = 0;
+                }
+            }
+            else
+            {
+                _calculatedVelocity.x = Mathf.MoveTowards(_calculatedVelocity.x, 0, CurrentPhysics.GroundDeacceleration);
+            }
+
+
         }
+
         protected virtual void CalculateVertical()
         {
         }
@@ -189,6 +256,30 @@ namespace SF.Characters.Controllers
             SideCollisionChecks();
             CheckOnCollisionActions();
         }
+
+        protected RaycastHit2D DebugBoxCast(Vector2 origin, 
+            Vector2 size,
+            float angle,
+            Vector2 direction, 
+            float distance, 
+            LayerMask layerMask)
+        {
+#if UNITY_EDITOR
+            Debug.DrawLine(origin, origin + (direction * distance));
+#endif
+            return Physics2D.BoxCast(origin, size,angle,direction, distance, layerMask);
+        }
+
+        protected RaycastHit2D DebugRayCast(Vector2 origin, Vector2 direction, float distance, LayerMask layerMask)
+        {
+#if UNITY_EDITOR
+
+            Debug.DrawLine(origin, origin + (direction * distance));
+#endif
+            return Physics2D.Raycast(origin, direction, distance, layerMask);
+        }
+
+
         protected virtual void GroundChecks()
         {
             // This will eventually also show colliding with other things than platforms.
@@ -197,6 +288,15 @@ namespace SF.Characters.Controllers
         protected virtual void CeilingChecks()
         {
             CollisionInfo.IsCollidingAbove = RaycastMultiple(Bounds.TopLeft(), Bounds.TopRight(), Vector2.up, CollisionController.VerticalRayDistance, PlatformFilter, CollisionController.VerticalRayAmount);
+
+            if(CollisionInfo.IsCollidingAbove)
+            {
+                // If colliding above reset the vertical velocity if it is above zero
+                // This prevents that hanging feeling when touching a ceiling.
+
+                if(_calculatedVelocity.y > 0)
+                    _calculatedVelocity.y = 0;
+            }
         }
         protected virtual void SideCollisionChecks()
         {
@@ -216,7 +316,7 @@ namespace SF.Characters.Controllers
             {
                 stepPercent = (float)x / (float)(numberOfRays - 1);
                 startPosition = Vector2.Lerp(origin, end, stepPercent);
-                hasHit = Physics2D.Raycast(startPosition, direction, distance, layerMask);
+                hasHit = DebugRayCast(startPosition, direction, distance, layerMask);
 
                 if(hasHit)
                 {
@@ -270,10 +370,38 @@ namespace SF.Characters.Controllers
         {
             Direction *= -1;
         }
+        
+        protected void OnStatusEffectChanged(StatusEffect statusEffect)
+        {
+            if(statusEffect == StatusEffect.Beserk)
+                GetComponent<SpriteRenderer>().color = Color.red;
+        }
+
+
+        /// <summary>
+        /// Corects the posiution if the character clips or goes through an object due to moving to fast during a frame.
+        /// </summary>
+        protected virtual void PositionCorection()
+        {
+            var raycastHit2D = Physics2D.Raycast(
+                    transform.position,Vector2.down, 
+                    3,
+                    PlatformFilter.layerMask
+                );
+            if(raycastHit2D)
+                DistanceToGround = raycastHit2D.distance - (Bounds.size.y / 2);
+            else 
+                DistanceToGround = 0;
+        }
+
         public virtual void Reset()
         {
             if(_rigidbody2D == null)
                 _rigidbody2D = GetComponent<Rigidbody2D>();
+
+            /* This un childs characters from attached platforms like
+             * moving, climables, and so forth on death to prevent being linked to them if dying while on one. */
+            transform.parent = null;
 
             _calculatedVelocity = Vector3.zero;
             _rigidbody2D.linearVelocity = Vector3.zero;

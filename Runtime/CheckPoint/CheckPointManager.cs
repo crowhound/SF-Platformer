@@ -39,6 +39,10 @@ namespace SF.SpawnModule
         }
         private void Start()
         {
+			// If we have no starting check point set try to find one.
+			if(StartingCheckPoint == null)
+				StartingCheckPoint = FindFirstObjectByType<CheckPoint>();
+
 			
 			if(StartingCheckPoint != null && CurrentCheckPoint == null)
 				CurrentCheckPoint = StartingCheckPoint;

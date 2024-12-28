@@ -1,7 +1,7 @@
 {
   "name": "shatter-fantasy.platformer",
-  "version": "0.0.1",
-  "unity": "2023.2",
+  "version": "0.0.2",
+  "unity": "6000.0",
   "displayName": "SF Platformer",
   "description": "The SF Platformer package provides a template that can be customized and extended for making Platformer and Metroidvania like games.",
   "keywords": [
@@ -13,7 +13,7 @@
     "url": "https://github.com/crowhound"
   },
   "dependencies": {
-    "com.unity.inputsystem": "1.8.0",
+    "com.unity.inputsystem": "1.11.2",
     "com.unity.cinemachine": "3.1.2"
   },
   "relatedPackages": {},

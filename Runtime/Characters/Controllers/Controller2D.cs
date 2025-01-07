@@ -96,7 +96,7 @@ namespace SF.Characters.Controllers
 
             if(_rigidbody2D != null)
             {
-                _rigidbody2D.bodyType = RigidbodyType2D.Dynamic;
+                //_rigidbody2D.bodyType = RigidbodyType2D.Dynamic;
                 _rigidbody2D.freezeRotation = true;
             }
         }
@@ -172,18 +172,26 @@ namespace SF.Characters.Controllers
             }
 
             //Vector2 newPosition = (Vector2)transform.position + _calculatedVelocity * Time.deltaTime; 
-            //_rigidbody2D.MovePosition(newPosition);
+            //_rigidbody2D.MovePosition(newPosition);            
 
             transform.Translate(_calculatedVelocity * Time.deltaTime);
 
+
+            // Adjust the position of the Character if we do have a clip inside a wall.
             if(CollisionInfo.BelowHit)
             {
-                if(transform.position.y < CollisionInfo.BelowHit.point.y)
-                    transform.position = CollisionInfo.BelowHit.point + new Vector2(0, 0.25f);
+                ColliderDistance2D colliderDistance = _boxCollider.Distance(CollisionInfo.BelowHit.collider);
+                if(colliderDistance.isOverlapped)
+                {
+                    // This means we are inside something.
+                    if(colliderDistance.distance < 0)
+                    {
+                        Vector2 adjustedPosition = colliderDistance.distance * colliderDistance.normal;
+                        transform.position = transform.position + (Vector3)adjustedPosition;
+                    }
+                }
             }
-
         }
-
 
         protected virtual void CalculateHorizontal()
         {
@@ -205,13 +213,12 @@ namespace SF.Characters.Controllers
 
                     _calculatedVelocity.x = 0;
                 }
+
             }
             else
             {
                 _calculatedVelocity.x = Mathf.MoveTowards(_calculatedVelocity.x, 0, CurrentPhysics.GroundDeacceleration);
             }
-
-
         }
 
         protected virtual void CalculateVertical()

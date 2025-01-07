@@ -205,7 +205,8 @@ namespace SF.Characters.Controllers
 			else
 			{
 				_calculatedVelocity.x = Mathf.MoveTowards(_calculatedVelocity.x, 0, CurrentPhysics.GroundDeacceleration);
-			}
+
+            }
 		}
 		protected override void CalculateVertical()
 		{
@@ -253,7 +254,7 @@ namespace SF.Characters.Controllers
 			// FIX THIS or the character becomes a mach 10 rocket sometimes.
 
 			base.Move();
-		}
+        }
 		public virtual void UpdatePhysics(MovementProperties movementProperties)
 		{
 			CurrentPhysics.GroundSpeed = movementProperties.GroundSpeed;

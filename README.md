@@ -17,7 +17,7 @@ Here is an example of using the pre-alpha 10 version being worked on to make a c
 Please note the documentation is very early wip. The manual link at the top left is not ready yet. So clicking it does nothing. We are working on videos currently for the manual. 
 Currently somethings are not in the final location for namespaces. In the root SF namespace you will see some classes, structs, or interfaces needing moved to their proper namespaces.
 
-[WIP SF PLatformer Documentation](https://crowhound.github.io/SF-Platformer/api/SF.Physics.CollisionInfo.html)
+[WIP SF Platformer Documentation](https://crowhound.github.io/SF-Platformer/api/SF.Physics.CollisionInfo.html)
 
 ## Install Instructions
 This package was built with the idea of using Unity's built in package manager to help make installing and choosing which version of the package you want to use easier.

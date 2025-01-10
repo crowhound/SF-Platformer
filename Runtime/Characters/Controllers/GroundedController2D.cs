@@ -88,10 +88,12 @@ namespace SF.Characters.Controllers
 		#region Collision Calculations
 		protected override void ColisionChecks()
 		{
+			CollisionInfo.CollisionHits.Clear();
             _wasGroundedLastFrame = IsGrounded;
 			GroundChecks();
 			CeilingChecks();
 			SideCollisionChecks();
+			ClimbableSurfaceChecks();
 			CheckOnCollisionActions();
 		}
 		protected override void GroundChecks()
@@ -110,12 +112,14 @@ namespace SF.Characters.Controllers
 			// If we did collide with something below.
 			if(CollisionInfo.BelowHit)
 			{
+				CollisionInfo.CollisionHits.Add(CollisionInfo.BelowHit);
+
                 // If we are standing on something keep track of it. This can be useful for things like moving platforms.
                 StandingOnObject = CollisionInfo.BelowHit.collider.gameObject;
 
-                // Only set the transform if we already are not a child of another gameobject.
-                // If we don't do this than we will cnstantly be restuck to the moving platforms transform.
-                if(transform.parent == null)
+				// Only set the transform if we already are not a child of another gameobject.
+				// If we don't do this than we will cnstantly be restuck to the moving platforms transform.
+				if(transform.parent == null && LayerMask.LayerToName(CollisionInfo.BelowHit.collider.gameObject.layer) == "MovingPlatforms")
                     transform.SetParent(CollisionInfo.BelowHit.collider.gameObject.transform);
 
                 CollisionInfo.IsCollidingBelow = true;
@@ -154,26 +158,36 @@ namespace SF.Characters.Controllers
         }
 		protected override void SideCollisionChecks()
 		{
+			//TODO: Clean the below up and fuse the IsColliding value setting with the variable hit2D checks.
+
             // Right Side
-            CollisionInfo.IsCollidingRight = Physics2D.BoxCast(Bounds.MiddleRight(), new Vector2(.02f,Bounds.size.y - CollisionController.RayOffset), 0, Vector2.right, CollisionController.HoriztonalRayDistance, PlatformFilter.layerMask);
+            CollisionInfo.RightHit = Physics2D.BoxCast(Bounds.MiddleRight(), new Vector2(.02f,Bounds.size.y - CollisionController.RayOffset), 0, Vector2.right, CollisionController.HoriztonalRayDistance, PlatformFilter.layerMask);
+
+			CollisionInfo.IsCollidingRight = CollisionInfo.RightHit;
 
             // Left Side
-            CollisionInfo.IsCollidingLeft = Physics2D.BoxCast(Bounds.MiddleLeft(), new Vector2(.02f, Bounds.size.y - CollisionController.RayOffset), 0, Vector2.left, CollisionController.HoriztonalRayDistance, PlatformFilter.layerMask);
+            CollisionInfo.LeftHit = Physics2D.BoxCast(Bounds.MiddleLeft(), new Vector2(.02f, Bounds.size.y - CollisionController.RayOffset), 0, Vector2.left, CollisionController.HoriztonalRayDistance, PlatformFilter.layerMask);
 
-			RaycastHit2D hit2D;
-
-            if(Direction.x > 0) // Looking Right
-				hit2D = Physics2D.BoxCast(Bounds.MiddleRight(), _boxCollider.size, 0, Vector2.right, CollisionController.HoriztonalRayDistance, PlatformFilter.layerMask);
-			else
-                hit2D = Physics2D.BoxCast(Bounds.MiddleLeft(), new Vector2(CollisionController.HoriztonalRayDistance, _boxCollider.size.y), 0, Vector2.left, CollisionController.HoriztonalRayDistance, PlatformFilter.layerMask);
-
-			if(!hit2D)
-                CollisionInfo.ClimbableSurfaceHit = new RaycastHit2D();
-            else if(hit2D.collider.TryGetComponent(out ClimbableSurface climbableSurface))
-				CollisionInfo.ClimbableSurfaceHit = hit2D;
+            CollisionInfo.IsCollidingLeft = CollisionInfo.LeftHit;
 		}
 
-		#endregion
+		protected virtual void ClimbableSurfaceChecks()
+		{
+			foreach(RaycastHit2D hit2D in CollisionInfo.CollisionHits)
+			{
+				if(!hit2D)
+					CollisionInfo.ClimbableSurfaceHit = new RaycastHit2D();
+				else if(hit2D.collider.TryGetComponent(out ClimbableSurface climbableSurface))
+				{
+					CollisionInfo.ClimbableSurfaceHit = hit2D;
+                    // We return and break out of the loop so any other collision hits don't go through the
+                    // initial if statement making the CollisionInfo.ClimbableSurfaceHit = a new RaycastHit2D()
+                    return;
+				}
+            }
+        }
+
+        #endregion
 
         protected override void CalculateHorizontal()
 		{
@@ -274,8 +288,9 @@ namespace SF.Characters.Controllers
 		protected override void CalculateMovementState()
 		{
 
-			if(CharacterState.CharacterStatus == CharacterStatus.Dead )
+			if(CharacterState.CharacterStatus == CharacterStatus.Dead)
 				return;
+
 
 			// TODO: There are some places that set the values outside of this function. Find a way to make it where this function is the only needed one. Example IsJump in the Jumping Ability.
 

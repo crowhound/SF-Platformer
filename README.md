@@ -8,10 +8,6 @@ Example the future audio features will be in a pull-request called Audio-Manager
 
 ## Demo Videos
 There will be demo videos being recorded as progress is made on the package to show off how to do a few things.
-Here is an example of using the pre-alpha 10 version being worked on to make a crushing ai enemy.
-
-[SF Platformer Crushing AI Demo](https://www.youtube.com/watch?v=jRTSwovfHqQ)
-
 
 ## WIP Documentation.
 Please note the documentation is very early wip. The manual link at the top left is not ready yet. So clicking it does nothing. We are working on videos currently for the manual. 

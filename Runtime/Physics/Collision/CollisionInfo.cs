@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+
 using UnityEngine;
 
 namespace SF.Physics
@@ -11,6 +13,8 @@ namespace SF.Physics
     [Serializable]
 	public struct CollisionInfo
 	{
+        public List<RaycastHit2D> CollisionHits;
+
         /// <summary>
         /// The raycast hit detected during the ground collision check for below the character controller being used.
         /// This will return false when checked if null in an if statement when there is nothing being hit.

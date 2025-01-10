@@ -21,7 +21,7 @@ namespace SF.Characters.Controllers
 	public class GroundedController2D : Controller2D
 	{
 		[Header("Platform Settings")]
-        [SerializeField] protected ContactFilter2D OneWayPlatformFilter;
+        public ContactFilter2D OneWayPlatformFilter;
 		[SerializeField] protected LayerMask MovingPlatformLayer;
         [field:SerializeField] public GameObject StandingOnObject { get; protected set; }
 

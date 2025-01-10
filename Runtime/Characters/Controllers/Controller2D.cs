@@ -56,7 +56,7 @@ namespace SF.Characters.Controllers
         [NonSerialized] public Bounds Bounds;
         #endregion
         [Header("Collision Data")]
-        public CollisionInfo CollisionInfo;
+        public CollisionInfo CollisionInfo = new() { CollisionHits = new()};
         public CollisionController CollisionController = new(0.05f, 0.02f, 3, 4);
 
         /// <summary>
@@ -176,17 +176,61 @@ namespace SF.Characters.Controllers
 
             transform.Translate(_calculatedVelocity * Time.deltaTime);
 
+            /* If we are detecting a collision before the transform.Translate moved our character,
+            * than we should make sure we didn't clip through the collider.
+            * If we did correct our character's position.
+            */
 
-            // Adjust the position of the Character if we do have a clip inside a wall.
             if(CollisionInfo.BelowHit)
             {
                 ColliderDistance2D colliderDistance = _boxCollider.Distance(CollisionInfo.BelowHit.collider);
+
                 if(colliderDistance.isOverlapped)
                 {
                     // This means we are inside something.
                     if(colliderDistance.distance < 0)
                     {
-                        Vector2 adjustedPosition = colliderDistance.distance * colliderDistance.normal;
+                        Vector2 adjustedPosition =
+                            colliderDistance.distance * colliderDistance.normal;
+                        transform.position = transform.position + (Vector3)adjustedPosition;
+                    }
+                }
+            }
+
+
+            if(CollisionInfo.CollisionHits != null 
+                && CollisionInfo.CollisionHits.Count > 0)
+                CorrectCollisionClipping();
+        }
+
+        /// <summary>
+        /// If the transform translate puts us through a collider do to a off update frame for movement than correct the transform to prevent overlapping.
+        /// </summary>
+        protected virtual void CorrectCollisionClipping()
+        {
+  /* If for some reason this frame we are colliding on all four side we shouldn't try to correct our position.
+             * If we try to correct our position in this state we could just be corrected from one direction making us clip into another direction.
+             * Example case this happens. Imagine you have a crushing enemy like Mario's Thwomp meant to hurt, but not killl the player.
+             * The thwomp would be pushing you into the floor and the correction formula would place you back upward.
+             * Samething for side collisions.
+             */
+            if(CollisionInfo.CeilingHit && CollisionInfo.BelowHit
+                && CollisionInfo.LeftHit && CollisionInfo.RightHit)
+                return;
+
+            // Adjust the position of the Character if we do have a clip inside a wall.
+            // Do this for each hit we have in our CollisionInfo struct.
+            foreach(RaycastHit2D hit in CollisionInfo.CollisionHits)
+            {
+                ColliderDistance2D colliderDistance = _boxCollider.Distance(hit.collider);
+
+                if(colliderDistance.isOverlapped)
+                {
+                    // This means we are inside something.
+                    if(colliderDistance.distance < 0)
+                    {
+                        Vector2 adjustedPosition = 
+                            colliderDistance.distance * colliderDistance.normal;
                         transform.position = transform.position + (Vector3)adjustedPosition;
                     }
                 }
@@ -336,6 +380,8 @@ namespace SF.Characters.Controllers
                         CollisionInfo.CeilingHit = hasHit;
                     else if(direction.y < 0)
                         CollisionInfo.BelowHit = hasHit;
+
+                    CollisionInfo.CollisionHits.Add(hasHit);
                     return true;
                 }
             }
@@ -377,6 +423,11 @@ namespace SF.Characters.Controllers
         {
             Direction *= -1;
         }
+
+        public void SetDirection(float newDirection)
+        {
+            Direction = new Vector2(newDirection, 0);
+        }
         
         protected void OnStatusEffectChanged(StatusEffect statusEffect)
         {
@@ -388,16 +439,17 @@ namespace SF.Characters.Controllers
         /// <summary>
         /// Corects the posiution if the character clips or goes through an object due to moving to fast during a frame.
         /// </summary>
+        [Obsolete("In the move position we now have a small test that uses Unity ColliderDistance2D struct. It works a lot better and is simplier to work with.")]
         protected virtual void PositionCorection()
         {
             var raycastHit2D = Physics2D.Raycast(
-                    transform.position,Vector2.down, 
+                    transform.position, Vector2.down,
                     3,
                     PlatformFilter.layerMask
                 );
             if(raycastHit2D)
                 DistanceToGround = raycastHit2D.distance - (Bounds.size.y / 2);
-            else 
+            else
                 DistanceToGround = 0;
         }
 

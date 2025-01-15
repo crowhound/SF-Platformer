@@ -46,6 +46,9 @@ namespace SF.UI
 
         private void OnDisable()
         {
+            if(GameManager.Instance == null)
+                return;
+
             GameManager.Instance.OnGameMenuOpen -= OnGameMenuOpen;
             GameManager.Instance.OnGameMenuClose -= OnGameMenuClosed;
         }

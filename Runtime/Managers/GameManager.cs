@@ -102,7 +102,7 @@ namespace SF.Managers
 		{
 			LivesManager.RegisterEventListeners();
 		}
-		private void OnDestroy()
+        private void OnDisable ()
 		{
 			LivesManager.DeregisterEventListeners();
 		}

@@ -6,7 +6,7 @@ using UnityEngine;
 namespace SF
 {
     [System.Serializable]
-    public class LivesManager : EventListener<LivesEvent>
+    public class LivesManager : MonoBehaviour, EventListener<LivesEvent>
     { 
         public static int CurrentLives = 3;
         private int _currentLives 

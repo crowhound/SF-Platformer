@@ -26,13 +26,14 @@ namespace SF.Managers
 		MainMenu = 2
 	}
 
-    [DefaultExecutionOrder(-1)]
+    [DefaultExecutionOrder(-5)]
+    [RequireComponent(typeof(LivesManager))]
     public class GameManager : MonoBehaviour
     {
 		public GameControlState ControlState;
 		public GamePlayState PlayState;
 
-		public LivesManager LivesManager;
+		private LivesManager LivesManager;
 
         public const string ManagerObjName = "Game Wide Managers";
         public const string ManagerObjTag = "Game Manager";
@@ -52,7 +53,7 @@ namespace SF.Managers
                     // If no AudioManager was found in the scene make one than set it as the instance for the AudioManager.
                     if(_instance == null)
                     {
-                        GameObject go = GameObject.FindGameObjectWithTag("ManagerObjTag");
+                        GameObject go = GameObject.FindGameObjectWithTag(ManagerObjTag);
 
                         if(go == null)
                         {
@@ -75,7 +76,9 @@ namespace SF.Managers
 
         private void Awake()
         {
+            Debug.Log("Game Manager Awake");
             Instance = this;
+            LivesManager = GetComponent<LivesManager>();
             Application.targetFrameRate = 60;
         }
 
@@ -100,7 +103,7 @@ namespace SF.Managers
 
         private void OnEnable()
 		{
-			LivesManager.RegisterEventListeners();
+            LivesManager.RegisterEventListeners();
 		}
         private void OnDisable ()
 		{

@@ -1,6 +1,8 @@
+using System;
+
 using UnityEngine;
 
-namespace SF
+namespace SF.Managers
 {
 	/// <summary>
 	/// The current state that is controlling the games input and actions. 
@@ -34,6 +36,9 @@ namespace SF
 
         public const string ManagerObjName = "Game Wide Managers";
         public const string ManagerObjTag = "Game Manager";
+
+        public Action OnGameMenuOpen;
+        public Action OnGameMenuClose;
 
         private static GameManager _instance;
         public static GameManager Instance
@@ -72,6 +77,25 @@ namespace SF
         {
             Instance = this;
             Application.targetFrameRate = 60;
+        }
+
+        public void ToggleGameMenu()
+        {
+            if(PlayState == GamePlayState.Playing)
+                GameMenuOpen();
+            else
+                GameMenuClose();
+        }
+        private void GameMenuOpen()
+        {
+            PlayState = GamePlayState.MainMenu;
+            OnGameMenuOpen?.Invoke();
+        }
+
+        private void GameMenuClose()
+        {
+            PlayState = GamePlayState.Playing;
+            OnGameMenuClose?.Invoke();
         }
 
         private void OnEnable()

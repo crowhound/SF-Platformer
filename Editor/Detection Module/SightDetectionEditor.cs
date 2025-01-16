@@ -1,15 +1,14 @@
 using UnityEditor;
-using UnityEngine;
 
 namespace SF.DetectionModule
 {
-    [CustomEditor(typeof(SightDetection))]
     public class SightDetectionEditor : Editor
     {
+        /*
         void OnSceneGUI()
         {
 
-            SightDetection myObj = (SightDetection)target;
+            SightDetectionDecision myObj = (SightDetectionDecision)target;
             float radian = myObj.StartingAngle * Mathf.Deg2Rad;
             Handles.color = myObj.ToolHandleColor;
             Handles.DrawSolidArc(myObj.transform.position, myObj.transform.forward, new Vector3(Mathf.Cos(radian),Mathf.Sin(radian)) , myObj.FieldOfView, myObj.DetectionSize);
@@ -35,5 +34,6 @@ namespace SF.DetectionModule
                 myObj.FieldOfView = newFOV;
             }
         }
+        */
     }
 }

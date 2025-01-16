@@ -4,7 +4,9 @@ namespace SF.Events
     public enum GameMenuEventTypes
     {
         OpenGameMenu,
-        CloseGameMenu
+        CloseGameMenu,
+        OpenOptionsMenu,
+        CloseOptionsMenu
     }
     public struct GameMenuEvent
     {

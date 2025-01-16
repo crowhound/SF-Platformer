@@ -16,6 +16,7 @@ namespace SF.UI
         private Canvas _mainMenuCanvas;
         
         [SerializeField] private Button _exitGameButton;
+        [SerializeField] private Button _optionsGameButton;
 
         private void Awake()
         {
@@ -25,6 +26,11 @@ namespace SF.UI
         private void OnExitGameBtnClicked()
         {
             ApplicationEvent.Trigger(ApplicationEventTypes.ExitApplication);
+        }
+
+        private void OnOptionsMenuBtnClicked()
+        {
+            GameMenuEvent.Trigger(GameMenuEventTypes.OpenOptionsMenu);
         }
 
         private void OnGameMenuOpen()
@@ -37,7 +43,7 @@ namespace SF.UI
 
             _mainMenuCanvas.enabled = true;
         }
-        private void OnGameMenuClosed()
+        private void OnGameMenuClose()
         {
             if(_mainMenuCanvas == null)
             {
@@ -46,6 +52,16 @@ namespace SF.UI
             }
 
             _mainMenuCanvas.enabled = false;
+        }
+        
+        private void OnOptionsMenuOpen()
+        {
+
+        }
+
+        private void OnOptionsMenuClose()
+        {
+
         }
 
         public void OnEvent(GameMenuEvent eventType)
@@ -59,7 +75,17 @@ namespace SF.UI
                     }
                 case GameMenuEventTypes.CloseGameMenu:
                     {
-                        OnGameMenuClosed();
+                        OnGameMenuClose();
+                        break;
+                    }
+                case GameMenuEventTypes.OpenOptionsMenu:
+                    {
+                        OnOptionsMenuOpen();
+                        break;
+                    }
+                case GameMenuEventTypes.CloseOptionsMenu:
+                    {
+                        OnOptionsMenuClose();
                         break;
                     }
             }
@@ -70,6 +96,9 @@ namespace SF.UI
             if(_exitGameButton != null)
                 _exitGameButton.onClick.AddListener(OnExitGameBtnClicked);
 
+            if(_optionsGameButton != null)
+                _optionsGameButton.onClick.AddListener(OnOptionsMenuBtnClicked);
+
             this.EventStartListening<GameMenuEvent>();
         }
 
@@ -77,6 +106,9 @@ namespace SF.UI
         {
             if(_exitGameButton != null)
                 _exitGameButton.onClick.RemoveAllListeners();
+
+            if(_optionsGameButton != null)
+                _optionsGameButton.onClick.RemoveAllListeners();
 
             this.EventStopListening<GameMenuEvent>();
         }

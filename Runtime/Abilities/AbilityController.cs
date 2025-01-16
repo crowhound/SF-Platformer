@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace SF.AbilityModule
 {
+    // Setting the default execution order past Controller2D.
+    // This gurantees the controller is already set up it's current physics struct.
+    [DefaultExecutionOrder(1)]
     public class AbilityController : MonoBehaviour
     {
         //The gameobject the abilities will control.
@@ -12,6 +15,7 @@ namespace SF.AbilityModule
         public List<AbilityCore> Abilities = new List<AbilityCore>();
 
         private Controller2D _controller2D;
+
         private void Awake()
         {
             Abilities = GetComponents<AbilityCore>().ToList();

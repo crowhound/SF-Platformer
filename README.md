@@ -1,15 +1,32 @@
 # SF-Platformer-Package
 This is Shatter Fantasy Platformer Unity package that can be used to create any game needing platformer like controls. 
 
-## Pre-alpha repo management warning
-Heads up during the pre-alpha most things were just committed directly to the main branch of the repo.
-Starting with alpha one we will have a branch for each development release cycle and we will be grouping feature sets into pull requests for organization.
-Example the future audio features will be in a pull-request called Audio-Manager-1. When it is finished, tested, and reviwed than it will be merged into the current release cycle being worked on.
+## Future Alpha Two Release
+Currently the second alpha is being worked on a seperate branch from the main branch. 
+
+### Already Completed Upcoming Features:
+
+#### Physics
+- Quite of a bit of improvements brought to the custom collision detection calculations in the Controller2D for physics.
+- Physics improvements brought by the implementation of ColliderDistance2D struct usage.
+- Added a list of CollisionHits that can be read from in any scenario they are needed in.
+
+#### Event System
+- Added a GameEvent EventListener for triggering events that change the control of the game like when pausing the game.
+- Added a ApplicationEvent EventListener for listening to application events like shutting down when quitting the game.
+- Added a GameMenu EventListener for triggering events when users interact with UI elements or press an input shortcut for brining up UI like the in game menu.
+
+### Currently In Progress Features
+- AIState for giving characters the ability to do detection systems like seeing while patrolling an area in games.
+- AIState for NPC characters to patroll an area back and forth.
+- Options menu system for volume control and some graphic setting event listeners.
+   - Fullscreen, windowed, borderless window
+   - Background music, master, sound effect, and ambient sound volume settings.
 
 ## Demo Videos
-There will be demo videos being recorded as progress is made on the package to show off how to do a few things.
+There will be demo videos as soon as I finished the options menu events.
 
-## WIP Documentation.
+## WIP API Documentation.
 Please note the documentation is very early wip. The manual link at the top left is not ready yet. So clicking it does nothing. We are working on videos currently for the manual. 
 Currently somethings are not in the final location for namespaces. In the root SF namespace you will see some classes, structs, or interfaces needing moved to their proper namespaces.
 
@@ -42,4 +59,7 @@ Example for the specific commit hash #76c6efb35ac8d4226a22f974939f300231a3637f. 
 
 Full example for wanting to get the SF Package that is release version alpha 1
 https://github.com/crowhound/SF-Platformer.git#v0.0.1
+
+Full example for wanting to get the SF Package that is being worked on in the alpha-two branch
+https://github.com/crowhound/SF-Platformer.git#alpha-two
 

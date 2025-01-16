@@ -3,14 +3,7 @@ using System.Collections.Generic;
 
 namespace SF.Events
 {
-    /// <summary>
-    /// The categories of events in the project.
-    /// </summary>
-    public enum GameEventTypes
-    {
-        Score,
-        Audio,
-    }
+
 
     /// <summary>
     /// A utility class that helps classes to start listening and stop listening to events using simple function calls. 

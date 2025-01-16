@@ -1,3 +1,4 @@
+using SF.Events;
 using SF.Managers;
 
 using UnityEngine;
@@ -37,7 +38,7 @@ namespace SF.InputModule
 
 		private void OnGameMenuToggled(InputAction.CallbackContext ctx)
 		{
-			GameManager.Instance.ToggleGameMenu();
+			GameEvent.Trigger(GameEventTypes.PauseToggle);
 		}
 
 		public void EnbaleActionMap()
@@ -52,11 +53,17 @@ namespace SF.InputModule
 
         private void OnEnable()
         {
-			Controls.Player.PauseToggle.performed += OnGameMenuToggled;
+			if(Controls != null)
+			{
+				Controls.Player.PauseToggle.performed += OnGameMenuToggled;
+			}
         }
         private void OnDisable()
         {
-            Controls.Player.PauseToggle.performed -= OnGameMenuToggled;
+			if(Controls != null)
+			{
+				Controls.Player.PauseToggle.performed -= OnGameMenuToggled;
+			}
         }
     }
 }

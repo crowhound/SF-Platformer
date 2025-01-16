@@ -1,6 +1,9 @@
+using SF.Events;
+using SF.InputModule;
 using SF.Managers;
 
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace SF.UI
 {
@@ -8,13 +11,20 @@ namespace SF.UI
     /// This is the in game menu that can be opened during playing. 
     /// For the main menu when loading up the game at the main screen look for the MainMenu scripts.
     /// </summary>
-    public class GameMenu : MonoBehaviour
+    public class GameMenu : MonoBehaviour, EventListener<GameMenuEvent>
     {
         private Canvas _mainMenuCanvas;
+        
+        [SerializeField] private Button _exitGameButton;
 
         private void Awake()
         {
             _mainMenuCanvas = GetComponent<Canvas>();
+        }
+
+        private void OnExitGameBtnClicked()
+        {
+            ApplicationEvent.Trigger(ApplicationEventTypes.ExitApplication);
         }
 
         private void OnGameMenuOpen()
@@ -38,19 +48,37 @@ namespace SF.UI
             _mainMenuCanvas.enabled = false;
         }
 
+        public void OnEvent(GameMenuEvent eventType)
+        {
+            switch(eventType.EventType)
+            {
+                case GameMenuEventTypes.OpenGameMenu:
+                    {
+                        OnGameMenuOpen();
+                        break;
+                    }
+                case GameMenuEventTypes.CloseGameMenu:
+                    {
+                        OnGameMenuClosed();
+                        break;
+                    }
+            }
+        }
+
         private void OnEnable()
         {
-            GameManager.Instance.OnGameMenuOpen += OnGameMenuOpen;
-            GameManager.Instance.OnGameMenuClose += OnGameMenuClosed;
+            if(_exitGameButton != null)
+                _exitGameButton.onClick.AddListener(OnExitGameBtnClicked);
+
+            this.EventStartListening<GameMenuEvent>();
         }
 
         private void OnDisable()
         {
-            if(GameManager.Instance == null)
-                return;
+            if(_exitGameButton != null)
+                _exitGameButton.onClick.RemoveAllListeners();
 
-            GameManager.Instance.OnGameMenuOpen -= OnGameMenuOpen;
-            GameManager.Instance.OnGameMenuClose -= OnGameMenuClosed;
+            this.EventStopListening<GameMenuEvent>();
         }
     }
 }

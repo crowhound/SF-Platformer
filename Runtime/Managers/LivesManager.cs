@@ -40,12 +40,12 @@ namespace SF
             LivesEvent.Trigger(LivesEventTypes.ChangedLives);
         }
 
-        public void RegisterEventListeners()
+        private void OnEnable()
         {
             this.EventStartListening<LivesEvent>();
         }
 
-        public void DeregisterEventListeners()
+        public void OnDisable()
         {
             this.EventStopListening<LivesEvent>();
         }

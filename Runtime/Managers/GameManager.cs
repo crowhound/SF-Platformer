@@ -1,6 +1,10 @@
 using System;
 
+using SF.Events;
+using SF.InputModule;
+
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace SF.Managers
 {
@@ -28,86 +32,77 @@ namespace SF.Managers
 
     [DefaultExecutionOrder(-5)]
     [RequireComponent(typeof(LivesManager))]
-    public class GameManager : MonoBehaviour
+    public class GameManager : MonoBehaviour, EventListener<ApplicationEvent>, EventListener<GameEvent>
     {
+        [SerializeField] private int _targetFrameRate = 60;
 		public GameControlState ControlState;
 		public GamePlayState PlayState;
 
-		private LivesManager LivesManager;
-
-        public const string ManagerObjName = "Game Wide Managers";
-        public const string ManagerObjTag = "Game Manager";
-
-        public Action OnGameMenuOpen;
-        public Action OnGameMenuClose;
-
-        private static GameManager _instance;
-        public static GameManager Instance
-        {
-            get
-            {
-                if(_instance == null)
-                {
-                    _instance = FindFirstObjectByType<GameManager>();
-
-                    // If no AudioManager was found in the scene make one than set it as the instance for the AudioManager.
-                    if(_instance == null)
-                    {
-                        GameObject go = GameObject.FindGameObjectWithTag(ManagerObjTag);
-
-                        if(go == null)
-                        {
-                            go = new GameObject(ManagerObjName, typeof(GameManager));
-                            Instantiate(go);
-                        }
-
-                        _instance = go.GetComponent<GameManager>();
-                    }
-                }
-
-                return _instance;
-            }
-            set
-            {
-                if(_instance == null)
-                    _instance = value;
-            }
-        }
-
         private void Awake()
         {
-            Debug.Log("Game Manager Awake");
-            Instance = this;
-            LivesManager = GetComponent<LivesManager>();
-            Application.targetFrameRate = 60;
+            Application.targetFrameRate = _targetFrameRate;
         }
 
-        public void ToggleGameMenu()
+        private void OnExitGame()
+        {
+            // Will need to do checks later for preventing shutdowns during saving and loading.
+            Application.Quit();
+        }
+
+        private void OnPausedToggle()
         {
             if(PlayState == GamePlayState.Playing)
-                GameMenuOpen();
-            else
-                GameMenuClose();
-        }
-        private void GameMenuOpen()
-        {
-            PlayState = GamePlayState.MainMenu;
-            OnGameMenuOpen?.Invoke();
+                Pause();
+            else // So we are already paused or in another menu.
+                Unpause();
         }
 
-        private void GameMenuClose()
+        private void Pause()
+        {
+            PlayState = GamePlayState.MainMenu;
+            GameMenuEvent.Trigger(GameMenuEventTypes.OpenGameMenu);
+        }
+
+        private void Unpause()
         {
             PlayState = GamePlayState.Playing;
-            OnGameMenuClose?.Invoke();
+            GameMenuEvent.Trigger(GameMenuEventTypes.CloseGameMenu);
+        }
+
+        public void OnEvent(ApplicationEvent eventType)
+        {
+            switch(eventType.EventType)
+            {
+                case ApplicationEventTypes.ExitApplication:
+                    {
+                        OnExitGame();
+                        break;
+                    }
+            }
+        }
+
+        public void OnEvent(GameEvent eventType)
+        {
+            switch(eventType.EventType)
+            {
+                case GameEventTypes.PauseToggle:
+                    {
+                        OnPausedToggle();
+                        break;
+                    }
+            }
         }
 
         private void OnEnable()
 		{
-            LivesManager.RegisterEventListeners();
+            this.EventStartListening<ApplicationEvent>();
+            this.EventStartListening<GameEvent>();
 		}
+
         private void OnDisable ()
 		{
-			LivesManager.DeregisterEventListeners();
-		}
-	}
+            this.EventStopListening<ApplicationEvent>();
+            this.EventStopListening<GameEvent>();
+        }  
+    }
 }

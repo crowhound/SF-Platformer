@@ -35,6 +35,8 @@ namespace SF.StateMachine.Core
 		protected DecisionTransition _decision = new();
 		protected bool _initialized = false;
 
+        protected Controller2D _controller;
+
         private void Awake()
 		{
 			Init();
@@ -64,8 +66,11 @@ namespace SF.StateMachine.Core
 
 			if(controller2D == null)
 				OnInit();
-			else 
-				OnInit(controller2D);
+			else
+			{
+				_controller = controller2D;
+                OnInit(controller2D);
+			}
 		}
 
 		/// <summary>

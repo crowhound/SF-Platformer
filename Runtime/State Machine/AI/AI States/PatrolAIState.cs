@@ -9,7 +9,6 @@ namespace SF.StateMachine
 {
     public class PatrolAIState : StateCore
     {
-        private Controller2D _controller;
         public bool StartingRight = true;
 		public bool DoesTurnOnHoles = true;
 		

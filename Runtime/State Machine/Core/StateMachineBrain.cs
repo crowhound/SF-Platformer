@@ -20,18 +20,21 @@ namespace SF.StateMachine.Core
 		[Tooltip("This is the gameobject that the newState machine brain is controlling.")]
 		
         public GameObject ControlledGameObject;
-        [SerializeField]protected List<StateCore> _states = new();
+        protected List<StateCore> _states = new();
 
         protected Controller2D _controller2D;
 		private void Awake()
 		{
-            if(!_states.Any()) return;
+
+            _states.Clear();
+            _states = GetComponentsInChildren<StateCore>().ToList();
 
             if(ControlledGameObject != null)
                 _controller2D = ControlledGameObject.GetComponent<Controller2D>();
             else
                 _controller2D = GetComponent<Controller2D>();
 
+            if(!_states.Any()) return;
 
             foreach(StateCore state in _states)
             {

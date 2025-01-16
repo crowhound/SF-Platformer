@@ -14,7 +14,6 @@ namespace SF.AbilityModule.Characters
             if(!_isInitialized || !enabled || _controller2d == null)
                 return false;
 
-            // Only crouch if we are grounded.
             return _controller2d.IsGrounded;
         }
 
@@ -32,16 +31,26 @@ namespace SF.AbilityModule.Characters
                 _controller2d.ResetColliderSize();
         }
 
+        private void OnInputStopCrouching(InputAction.CallbackContext context)
+        {
+            _controller2d.IsCrouching = false;
+            _controller2d.ResetColliderSize();
+        }
+
         private void OnEnable()
         {
             InputManager.Controls.Player.Enable();
             InputManager.Controls.Player.Crouch.performed += OnInputCrouch;
+            InputManager.Controls.Player.Move.performed += OnInputStopCrouching;
+            InputManager.Controls.Player.Jump.performed += OnInputStopCrouching;
         }
 
         private void OnDisable()
         {
             if(InputManager.Controls == null) return;
             InputManager.Controls.Player.Crouch.performed -= OnInputCrouch;
+            InputManager.Controls.Player.Move.performed -= OnInputStopCrouching;
+            InputManager.Controls.Player.Jump.performed -= OnInputStopCrouching;
         }
     }
 }

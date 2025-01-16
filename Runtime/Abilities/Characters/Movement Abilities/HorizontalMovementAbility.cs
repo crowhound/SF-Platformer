@@ -6,8 +6,17 @@ namespace SF.AbilityModule.Characters
 {
     public class HorizontalMovementAbility : AbilityCore, IInputAbility
     {
-
         [SerializeField] private bool _isRunningToggleable = true;
+
+        protected override void OnInitialize()
+        {
+			if(_isRunningToggleable)
+			{
+				_controller2d.ReferenceSpeed = _controller2d.IsRunning
+					? _controller2d.CurrentPhysics.GroundRunningSpeed
+					: _controller2d.CurrentPhysics.GroundSpeed;
+			}
+        }
         #region Input Actions
         private void OnInputMove(InputAction.CallbackContext context)
 		{

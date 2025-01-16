@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using SF.Characters.Controllers;
+
 using UnityEngine;
 
 namespace SF.StateMachine.Core
@@ -20,15 +22,21 @@ namespace SF.StateMachine.Core
         public GameObject ControlledGameObject;
         [SerializeField]protected List<StateCore> _states = new();
 
+        protected Controller2D _controller2D;
 		private void Awake()
 		{
-			_states = GetComponents<StateCore>().ToList();
             if(!_states.Any()) return;
+
+            if(ControlledGameObject != null)
+                _controller2D = ControlledGameObject.GetComponent<Controller2D>();
+            else
+                _controller2D = GetComponent<Controller2D>();
+
 
             foreach(StateCore state in _states)
             {
                 state.StateBrain = this;
-                state.Init();
+                state.Init(_controller2D);
             }
 		}
 
@@ -51,7 +59,7 @@ namespace SF.StateMachine.Core
         private void UpdateState()
 		{
             if (CurrentState == null)
-                return;  
+                return;
 
             CurrentState.UpdateState();
 		}

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using SF.Characters.Controllers;
 using SF.StateMachine.Decisions;
 
 using UnityEngine;
@@ -9,17 +10,16 @@ namespace SF.StateMachine.Core
 {
 	public class DecisionTransition
 	{
-		public bool CanTransist = false;
+		public bool CanTransist;
 		public StateCore StateGoingTo;
 	}
-
 
 	/// <summary>
 	/// <seealso cref="StateMachineBrain"/>
 	/// </summary>
-	public class StateCore : MonoBehaviour, IState
-	{
-		[field: SerializeField] public string StateName { get; protected set; } = "Idle";
+	public abstract class StateCore : MonoBehaviour
+    {
+		public string StateName { get; protected set; } = "Idle";
 
 		/// <summary>
 		/// This is to allow setting states to enter themselves on loop.
@@ -32,10 +32,10 @@ namespace SF.StateMachine.Core
 		public List<StateDecisionCore> Decisions = new();
 		[HideInInspector] public StateMachineBrain StateBrain;
 
-		protected DecisionTransition _decision;
+		protected DecisionTransition _decision = new();
 		protected bool _initialized = false;
 
-		private void Awake()
+        private void Awake()
 		{
 			Init();
 			OnAwake();
@@ -43,35 +43,48 @@ namespace SF.StateMachine.Core
 		protected virtual void OnAwake()
 		{
 		}
-		private void Start()
+
+        private void Start()
 		{
 			OnStart();
 		}
-		protected virtual void OnStart()
+        
+        protected virtual void OnStart()
 		{
 
 		}
 		/// <summary>
-		/// This is run the very first time this object is enabled.
-		/// This won't ru everytime this state is interacted with.
+		/// This is run the very first time this object is enabled and when the StateMachineBrain inits it.
+		/// This won't run everytime this state is interacted with.
 		/// </summary>
-		public void Init()
+		public void Init(Controller2D controller2D = null)
 		{
 			if(!_initialized)
 				_initialized = true;
-			
+
+			if(controller2D == null)
+				OnInit();
+			else 
+				OnInit(controller2D);
 		}
+
 		/// <summary>
 		/// This function can be overridden to give sub class of State Core custom Init functionality.
 		/// </summary>
-		void IState.OnInit()
+		protected virtual void OnInit()
 		{
 
 		}
-		/// <summary>
-		/// This is where the state machine calls the start of the states update.
-		/// </summary>
-		public void UpdateState()
+
+        protected virtual void OnInit(Controller2D controller2D)
+        {
+
+        }
+
+        /// <summary>
+        /// This is where the state machine calls the start of the states update.
+        /// </summary>
+        public void UpdateState()
 		{
 			CheckTransitions();
 			OnUpdateState();
@@ -81,11 +94,11 @@ namespace SF.StateMachine.Core
 		/// We do per frame update logic here. This is controlled by the state machine brain on the object.
 		/// </summary>
 		protected virtual void OnUpdateState(){}
-		
-		/// <summary>
-		/// This function is called from the <see cref="StateMachineBrain"/> to set up calling the OnEnterState function for methods.
-		/// </summary>
-		public void EnterState()
+
+        /// <summary>
+        /// This function is called from the <see cref="StateMachineBrain"/> to set up calling the OnEnterState function for methods.
+        /// </summary>
+        public void EnterState()
 		{
 			OnStateEnter();
 		}
@@ -141,6 +154,6 @@ namespace SF.StateMachine.Core
 		/// <summary>
 		/// When the state is disabled we can do clean up work here.
 		/// </summary>
-		protected virtual void OnDisable(){	}
+		protected virtual void OnDisable(){ }
 	}
 }

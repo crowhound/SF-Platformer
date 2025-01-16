@@ -10,9 +10,9 @@ namespace SF.StateMachine.Decisions
     /// </summary>
     public class StateDecisionCore : MonoBehaviour
     {
-        [SerializeField] protected string _decisionName = "Transition";
+        protected string _decisionName = "Transition";
 
-        [Header("_states")]
+        [Header("States")]
         [SerializeField] protected StateCore _trueState;
         [SerializeField] protected StateCore _falseState;
 

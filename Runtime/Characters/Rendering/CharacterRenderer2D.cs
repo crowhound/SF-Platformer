@@ -10,7 +10,7 @@ using SF.Characters.Controllers;
 namespace SF.Characters
 {
 	[RequireComponent(typeof(Animator), typeof(SpriteRenderer))]
-    public class Character2D : MonoBehaviour
+    public class CharacterRenderer2D : MonoBehaviour
     {
 #if DEBUG
 		private static ProfilerMarker s_AnimationUpdateMarker = new(ProfilerCategory.Animation, "SF.Animation.Update" );

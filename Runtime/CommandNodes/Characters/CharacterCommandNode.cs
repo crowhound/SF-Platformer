@@ -8,7 +8,7 @@ namespace SF.CommandModule
     public class CharacterCommandNode : CommandNode
     {
         [HideInInspector] public Controller2D Controller2D;
-        [HideInInspector] public Character2D Character2D;
+        [HideInInspector] public CharacterRenderer2D Character2D;
 
         public override Awaitable Use()
         {

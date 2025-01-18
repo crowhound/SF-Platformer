@@ -17,7 +17,7 @@ using SF.Platformer.Utilities;
 
 namespace SF.Characters.Controllers
 {
-	[RequireComponent(typeof(BoxCollider2D), typeof(Character2D))]
+	[RequireComponent(typeof(BoxCollider2D), typeof(Rigidbody2D), typeof(CharacterRenderer2D))]
 	public class GroundedController2D : Controller2D
 	{
 		[Header("Platform Settings")]
@@ -70,7 +70,7 @@ namespace SF.Characters.Controllers
 		protected int OneWayFilterBitMask => PlatformFilter.layerMask & OneWayPlatformFilter.layerMask;
 		public Action OnGrounded;
 
-		protected Character2D _character;
+		protected CharacterRenderer2D _character;
 		#region Components 
 		protected Vector2 _originalColliderSize;
 		protected Vector2 _modifiedColliderSize;
@@ -78,11 +78,10 @@ namespace SF.Characters.Controllers
 		#endregion
 		protected override void OnAwake()
 		{
-			_character = GetComponent<Character2D>();
+			_character = GetComponent<CharacterRenderer2D>();
 			_boxCollider = GetComponent<BoxCollider2D>();
 			Bounds = _boxCollider.bounds;
 			_originalColliderSize = _boxCollider.size;
-
 		}
 
 		#region Collision Calculations

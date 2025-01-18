@@ -26,7 +26,7 @@ namespace SF.CommandModule
             {
                 if(cmd is CharacterCommandNode characterCommand)
                 {
-                    characterCommand.Character2D = GetComponent<Character2D>();
+                    characterCommand.Character2D = GetComponent<CharacterRenderer2D>();
                     characterCommand.Controller2D = GetComponent<Controller2D>();
                 }    
             }

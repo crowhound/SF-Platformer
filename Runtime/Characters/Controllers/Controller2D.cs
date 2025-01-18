@@ -181,20 +181,34 @@ namespace SF.Characters.Controllers
             * If we did correct our character's position.
             */
 
+       
             if(CollisionInfo.BelowHit)
             {
-                ColliderDistance2D colliderDistance = _boxCollider.Distance(CollisionInfo.BelowHit.collider);
+                /* Important Note: we should make sure any CollisionInfo hits is not our own player collider.
+                This happens if the player is on one of the physics layers we are casting against. */
 
-                if(colliderDistance.isOverlapped)
+                /* Make sure if someone accidentally places the player on a layer being casted against
+                    We don't take it into calculations. We should do this on the line after casting the ray so no other checks using CollisionInfo.BelowHit using a player collider.
+                */
+                if(CollisionInfo.BelowHit.collider == _boxCollider)
                 {
-                    // This means we are inside something.
-                    if(colliderDistance.distance < 0)
-                    {
-                        Vector2 adjustedPosition =
-                            colliderDistance.distance * colliderDistance.normal;
-                        transform.position = transform.position + (Vector3)adjustedPosition;
-                    }
+                    CollisionInfo.BelowHit = new RaycastHit2D();
                 }
+                else // The CollisionInfo.BelowHit is not a RaycastHit2D on our own collider.
+                {
+                    ColliderDistance2D colliderDistance = _boxCollider.Distance(CollisionInfo.BelowHit.collider);
+
+                    if(colliderDistance.isOverlapped)
+                    {
+                        // This means we are inside something.
+                        if(colliderDistance.distance < 0)
+                        {
+                            Vector2 adjustedPosition =
+                                colliderDistance.distance * colliderDistance.normal;
+                            transform.position = transform.position + (Vector3)adjustedPosition;
+                        }
+                    }
+                } // end of else
             }
 
 
@@ -208,7 +222,7 @@ namespace SF.Characters.Controllers
         /// </summary>
         protected virtual void CorrectCollisionClipping()
         {
-  /* If for some reason this frame we are colliding on all four side we shouldn't try to correct our position.
+            /* If for some reason this frame we are colliding on all four side we shouldn't try to correct our position.
              * If we try to correct our position in this state we could just be corrected from one direction making us clip into another direction.
              * Example case this happens. Imagine you have a crushing enemy like Mario's Thwomp meant to hurt, but not killl the player.
              * The thwomp would be pushing you into the floor and the correction formula would place you back upward.
@@ -300,6 +314,10 @@ namespace SF.Characters.Controllers
         #endregion
 
         #region Collision Calculations
+
+        /* TODO: We should make sure any CollisionInfo hits is not our own player collider.
+               This happens if the player is on one of the physics layers we are casting against. */
+
         protected virtual void ColisionChecks()
         {
             GroundChecks();

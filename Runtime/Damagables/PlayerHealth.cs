@@ -1,11 +1,15 @@
-using SF.Events;
-
 using UnityEngine;
+
+using SF.Events;
+using SF.UI;
+
 
 namespace SF.SpawnModule
 {
     public class PlayerHealth : CharacterHealth, IDamagable
     {
+        [SerializeField] private FillBarUGUI _hpBar;
+
         protected override void Kill()
         {
             base.Kill();
@@ -26,6 +30,26 @@ namespace SF.SpawnModule
                 transform.position = CheckPointManager.Instance.CurrentCheckPoint.transform.position;
 
             base.Respawn();
+        }
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+
+            if(_hpBar != null)
+                HealthChangedCallback += () =>
+                {                  
+                    _hpBar.SetValueWithoutNotify((float)CurrentHealth / (float)MaxHealth);
+                };
+        }
+
+        private void OnDisable()
+        {
+            if(_hpBar != null)
+                HealthChangedCallback -= () =>
+                {
+                    _hpBar.SetValueWithoutNotify((float)CurrentHealth / (float)MaxHealth);
+                };
         }
     }
 }

@@ -1,5 +1,6 @@
 using UnityEngine;
 using SF.Events;
+using System;
 
 namespace SF.SpawnModule
 {
@@ -10,23 +11,38 @@ namespace SF.SpawnModule
     public class Health : MonoBehaviour, IDamagable, EventListener<RespawnEvent>
     {
 
-        public int CurrentHealth = 10;
+        [SerializeField] private int _currentHealth;
+        public int CurrentHealth
+        {
+            get { return _currentHealth; }
+            set
+            {
+                float previousValue = _currentHealth;
+                _currentHealth = value;
+
+                if(previousValue != _currentHealth)
+                    HealthChangedCallback?.Invoke();
+            }
+        }
+        public Action HealthChangedCallback;
+        
         public int MaxHealth = 10;
 
         [Header("SFX")]
         [SerializeField] protected AudioClip _deathSFX;
 
-        public virtual void TakeDamage(int damage)
+        public virtual void TakeDamage(int damage, Vector2 knockback = new Vector2())
         {
             if(!gameObject.activeSelf)
                 return;
 
             CurrentHealth -= damage;
 
-            if (CurrentHealth < 0)
+            if(CurrentHealth <= 0)
+            {
                 CurrentHealth = 0;
-            if(CurrentHealth == 0)
                 Kill();
+            }
         }
 
         public virtual void InstantKill()
@@ -59,7 +75,7 @@ namespace SF.SpawnModule
             gameObject.SetActive(true);
         }
 
-		protected void OnEnable()
+		protected virtual void OnEnable()
 		{
             this.EventStartListening<RespawnEvent>();
 		}

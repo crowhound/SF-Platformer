@@ -18,12 +18,12 @@ namespace SF.SpawnModule
         public float HitAnimationDuration = 0.3f;
 
         protected Controller2D _controller;
-        protected Character2D _character2D;
+        protected CharacterRenderer2D _character2D;
 
         protected void Awake()
         {
             _controller = GetComponent<Controller2D>();
-            _character2D = GetComponent<Character2D>();
+            _character2D = GetComponent<CharacterRenderer2D>();
         }
 
         protected override void Kill()
@@ -48,11 +48,12 @@ namespace SF.SpawnModule
             base.Respawn();
         }
 
-        public override void TakeDamage(int damage)
+        public override void TakeDamage(int damage, Vector2 knockback = new Vector2())
         {
             if(_character2D != null && !string.IsNullOrEmpty(HitAnimationName))
                 _character2D.SetAnimationState(HitAnimationName, HitAnimationDuration);
 
+            _controller.SetExternalVelocity(knockback);
             base.TakeDamage(damage);
         }
     }

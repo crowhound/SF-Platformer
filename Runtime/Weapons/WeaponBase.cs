@@ -12,7 +12,8 @@ namespace SF.Weapons
     {
         [SerializeField] protected ComboType ComboType;
         public List<ComboAttack> ComboAttacks = new();
-        [SerializeField] protected Character2D _character2D;
+        [SerializeField] protected Vector2 _knockBackForce;
+        [SerializeField] protected CharacterRenderer2D _character2D;
         [SerializeField] protected Controller2D _controller2D;
         [SerializeField] protected ContactFilter2D _hitBoxFilter;
 

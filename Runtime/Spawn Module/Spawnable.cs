@@ -1,8 +1,7 @@
-using System;
 using SF.Events;
 using UnityEngine;
 
-namespace SF
+namespace SF.SpawnModule
 {
     public class Spawnable : MonoBehaviour, EventListener<RespawnEvent>
     {

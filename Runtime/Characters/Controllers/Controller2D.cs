@@ -194,21 +194,9 @@ namespace SF.Characters.Controllers
                 {
                     CollisionInfo.BelowHit = new RaycastHit2D();
                 }
-                else // The CollisionInfo.BelowHit is not a RaycastHit2D on our own collider.
-                {
-                    ColliderDistance2D colliderDistance = _boxCollider.Distance(CollisionInfo.BelowHit.collider);
 
-                    if(colliderDistance.isOverlapped)
-                    {
-                        // This means we are inside something.
-                        if(colliderDistance.distance < 0)
-                        {
-                            Vector2 adjustedPosition =
-                                colliderDistance.distance * colliderDistance.normal;
-                            transform.position = transform.position + (Vector3)adjustedPosition;
-                        }
-                    }
-                } // end of else
+                if(CollisionInfo.BelowHit.distance > 0)
+                    LowerToGround();
             }
 
 
@@ -249,6 +237,14 @@ namespace SF.Characters.Controllers
                     }
                 }
             }
+        }
+
+
+        protected void LowerToGround()
+        {
+            transform.position = new Vector2(transform.position.x,
+                CollisionInfo.BelowHit.point.y + (Bounds.size.y / 2f + 0.01f)
+            );
         }
 
         protected virtual void CalculateHorizontal()
@@ -483,6 +479,20 @@ namespace SF.Characters.Controllers
             _calculatedVelocity = Vector3.zero;
             _rigidbody2D.linearVelocity = Vector3.zero;
             _externalVelocity = Vector3.zero;
+        }
+
+        /// <summary>
+        /// This is called from external classes to get the current colliders bounds value when a boxcollider has not been set and had it's bounds cached yet. Useful for editor debugging.
+        /// </summary>
+        /// <returns></returns>
+        public Bounds GetColliderBounds()
+        {
+            _boxCollider = GetComponent<BoxCollider2D>();
+            Bounds = _boxCollider.bounds;
+            if(_boxCollider != null)
+                return Bounds;
+            else 
+                return new Bounds();
         }
     }
 }

@@ -25,7 +25,6 @@ namespace SF.Characters.Controllers
 		[SerializeField] protected LayerMask MovingPlatformLayer;
         [field:SerializeField] public GameObject StandingOnObject { get; protected set; }
 
-
 		[Header("Booleans")]
 		public bool IsGrounded = false;
 		protected bool _wasGroundedLastFrame = false;
@@ -98,6 +97,12 @@ namespace SF.Characters.Controllers
 		protected override void GroundChecks()
 		{
 			Bounds = _boxCollider.bounds;
+
+			CollisionInfo.DistanceToGround = Physics2D.Raycast(
+				Bounds.BottomCenter(),
+				Vector2.down,
+				10,PlatformFilter.layerMask).distance;
+
 			// This will eventually also show colliding with other things than platforms.
             CollisionInfo.BelowHit = DebugBoxCast(
                         Bounds.BottomCenter(),
@@ -123,6 +128,7 @@ namespace SF.Characters.Controllers
 
                 CollisionInfo.IsCollidingBelow = true;
                 IsGrounded = true;
+				LowerToGround();
             }
 			else // If we are not colliding with anything below.
 			{
@@ -333,11 +339,6 @@ namespace SF.Characters.Controllers
 			}
 		}
 
-		protected void LowerToGround()
-		{
-			RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down);
-			transform.position = hit.point + new Vector2(0, CollisionController.VerticalRayDistance);
-		}
 
 		public virtual void ResizeCollider(Vector2 newSize)
 		{

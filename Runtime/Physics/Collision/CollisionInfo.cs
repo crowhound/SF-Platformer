@@ -13,6 +13,11 @@ namespace SF.Physics
     [Serializable]
 	public struct CollisionInfo
 	{
+        /// <summary>
+        /// If this is negative that means we are in the ground and need our position corrected.
+        /// </summary>
+        public float DistanceToGround;
+
         public List<RaycastHit2D> CollisionHits;
 
         /// <summary>

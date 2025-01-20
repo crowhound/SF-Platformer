@@ -174,10 +174,7 @@ namespace SF.Characters.Controllers
                 _calculatedVelocity = _externalVelocity;
                 _externalVelocity = Vector2.zero;
             }
-
-            //Vector2 newPosition = (Vector2)transform.position + _calculatedVelocity * Time.deltaTime; 
-            //_rigidbody2D.MovePosition(newPosition);            
-
+            
             transform.Translate(_calculatedVelocity * Time.deltaTime);
 
             /* If we are detecting a collision before the transform.Translate moved our character,

@@ -237,7 +237,10 @@ namespace SF.Characters.Controllers
 
 			if(!IsGrounded && !IsClimbing)
 			{
-				_calculatedVelocity.y += (-1 * CurrentPhysics.GravityScale);
+                // This is related to the formula of: square root of ( -2 (gravity * height) )
+                // https://en.wikipedia.org/wiki/Equations_for_a_falling_body#Example
+                _calculatedVelocity.y -= Mathf.Sqrt( -2 * -CurrentPhysics.GravityScale * Time.deltaTime); 
+
 				_calculatedVelocity.y = Mathf.Clamp(_calculatedVelocity.y,
 					-CurrentPhysics.TerminalVelocity,
 					CurrentPhysics.MaxUpForce);

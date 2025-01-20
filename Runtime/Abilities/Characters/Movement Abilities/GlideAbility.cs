@@ -22,6 +22,9 @@ namespace SF.AbilityModule.Characters
             if(!_isInitialized || !enabled || _controller2d == null)
                 return false;
 
+            if(_controller2d.PhysicsVolumeType == PhysicsVolumeType.Water)
+                return false;
+
             // If we are grounded we don't need to glide.
             if(_controller2d.IsGrounded)
                 return false;
@@ -38,8 +41,11 @@ namespace SF.AbilityModule.Characters
 
         private void GlideReset()
         {
+            if(!_controller2d.IsGliding)
+                return;
+
             _controller2d.IsGliding = false;
-            _controller2d.UpdatePhysics(_controller2d.DefaultPhysics);
+            _controller2d.ResetPhysics(_controller2d.DefaultPhysics);
         }
 
         private void OnMidGlideJump(InputAction.CallbackContext context)

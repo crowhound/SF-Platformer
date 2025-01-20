@@ -21,11 +21,12 @@ namespace SF.Characters.Controllers
 	public class GroundedController2D : Controller2D
 	{
 		[Header("Platform Settings")]
-        public ContactFilter2D OneWayPlatformFilter;
+		public ContactFilter2D OneWayPlatformFilter;
 		[SerializeField] protected LayerMask MovingPlatformLayer;
-        [field:SerializeField] public GameObject StandingOnObject { get; protected set; }
+		[field: SerializeField] public GameObject StandingOnObject { get; protected set; }
+		
 
-		[Header("Booleans")]
+        [Header("Booleans")]
 		public bool IsGrounded = false;
 		protected bool _wasGroundedLastFrame = false;
 		public bool IsRunning = false;
@@ -274,16 +275,7 @@ namespace SF.Characters.Controllers
 
 			base.Move();
         }
-		public virtual void UpdatePhysics(MovementProperties movementProperties)
-		{
-			CurrentPhysics.GroundSpeed = movementProperties.GroundSpeed;
-			CurrentPhysics.GroundAcceleration = movementProperties.GroundAcceleration;
-			CurrentPhysics.GroundMaxSpeed = movementProperties.GroundMaxSpeed;
-
-			CurrentPhysics.GravityScale = movementProperties.GravityScale;
-			CurrentPhysics.TerminalVelocity = movementProperties.TerminalVelocity;
-			CurrentPhysics.MaxUpForce = movementProperties.MaxUpForce;
-		}
+		
 		/// <summary>
 		/// Calculates the current movement state that the player is currently in.
 		/// </summary>
@@ -364,7 +356,23 @@ namespace SF.Characters.Controllers
 			}
 		}
 
-       
+        public override void UpdatePhysics(MovementProperties movementProperties,
+             PhysicsVolumeType volumeType = PhysicsVolumeType.None)
+        {
+			base.UpdatePhysics(movementProperties, volumeType);
+
+           ReferenceSpeed =  IsRunning
+                    ? CurrentPhysics.GroundRunningSpeed
+                    : CurrentPhysics.GroundSpeed;
+        }
+
+        public override void ResetPhysics(MovementProperties movementProperties)
+        {
+			base.ResetPhysics(movementProperties);
+            ReferenceSpeed = IsRunning
+                    ? CurrentPhysics.GroundRunningSpeed
+                    : CurrentPhysics.GroundSpeed;
+        }
 
 #if UNITY_EDITOR
 

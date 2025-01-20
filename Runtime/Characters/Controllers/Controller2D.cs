@@ -30,6 +30,10 @@ namespace SF.Characters.Controllers
         [Header("Physics Properties")]
         public MovementProperties DefaultPhysics = new(new Vector2(5, 5));
         public MovementProperties CurrentPhysics = new(new Vector2(5, 5));
+        /// <summary>
+        /// The type of PhysicsVolumeType the controller is in. Sets as none if not in one.
+        /// </summary>
+        public PhysicsVolumeType PhysicsVolumeType;
 
         public CharacterState CharacterState;
         public ContactFilter2D PlatformFilter;
@@ -239,7 +243,6 @@ namespace SF.Characters.Controllers
             }
         }
 
-
         protected void LowerToGround()
         {
             transform.position = new Vector2(transform.position.x,
@@ -442,7 +445,32 @@ namespace SF.Characters.Controllers
         {
             Direction = new Vector2(newDirection, 0);
         }
-        
+
+        public virtual void UpdatePhysics(MovementProperties movementProperties, 
+            PhysicsVolumeType volumeType = PhysicsVolumeType.None)
+        {
+            CurrentPhysics.GroundSpeed = movementProperties.GroundSpeed;
+            CurrentPhysics.GroundRunningSpeed = movementProperties.GroundRunningSpeed;
+            CurrentPhysics.GroundAcceleration = movementProperties.GroundAcceleration;
+            CurrentPhysics.GroundMaxSpeed = movementProperties.GroundMaxSpeed;
+
+            CurrentPhysics.GravityScale = movementProperties.GravityScale;
+            CurrentPhysics.TerminalVelocity = movementProperties.TerminalVelocity;
+            CurrentPhysics.MaxUpForce = movementProperties.MaxUpForce;
+
+            PhysicsVolumeType = volumeType;
+
+            ReferenceSpeed = CurrentPhysics.GroundSpeed;
+        }
+
+        public virtual void ResetPhysics(MovementProperties movementProperties)
+        {
+            CurrentPhysics = DefaultPhysics;
+            PhysicsVolumeType = PhysicsVolumeType.None;
+
+            ReferenceSpeed = CurrentPhysics.GroundSpeed;
+        }
+
         protected void OnStatusEffectChanged(StatusEffect statusEffect)
         {
             if(statusEffect == StatusEffect.Beserk)

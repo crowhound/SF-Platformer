@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 
+using Unity.Properties;
+
 using UnityEngine;
 
 namespace SF.DataManagement
@@ -20,9 +22,10 @@ namespace SF.DataManagement
 
         // Key for reading and writing encrypted data.
         // (This is a "hardcoded" secret key. )
-        private static byte[] SavedKey = { 0x16, 0x15, 0x16, 0x15, 0x16, 0x15, 0x16, 0x15, 0x16, 0x15, 0x16, 0x15, 0x16, 0x15, 0x16, 0x15 };
+        private readonly static byte[] SavedKey = { 0x16, 0x15, 0x16, 0x15, 0x16, 0x15, 0x16, 0x15, 0x16, 0x15, 0x16, 0x15, 0x16, 0x15, 0x16, 0x15 };
 
-        public static void SaveDataStream()
+
+        public static void SaveDataFile()
         {
             // Create an AES instance
             // The i stands for input
@@ -48,6 +51,7 @@ namespace SF.DataManagement
 
             // Create StreamWriter, wrapping CryptoStream.
             StreamWriter streamWriter = new StreamWriter(cryptoStream);
+
 
             // Serialize the SaveFileData object into JSON and save string.
             string jsonString = JsonUtility.ToJson(SaveFiles[0]);
